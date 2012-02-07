@@ -7,11 +7,28 @@
     board
     (assoc-in board posn new-value)))
 
-(defn- num-non-nil [l]
-  (count (filter #(not (nil? %)) l)))
-(defn num-moves-made [board]
-  (reduce + (map num-non-nil board)))
+(defn row-wins [board-size]
+  (for [row (range board-size)]
+    (for [col (range board-size)]
+      [row col])))
 
+(defn col-wins [board-size]
+  (for [col (range board-size)]
+    (for [row (range board-size)]
+      [row col])))
+
+(defn is-winning-path [path board]
+  (let [board-residents (map #(get-in board %) path)]
+    (prn board-residents)
+    ))
+
+(defn diag-wins [board-size]
+  (list
+    (for [row-and-col (range board-size)]
+      [row-and-col row-and-col])
+    (for [row-and-col (range board-size)]
+      [row-and-col (- (dec board-size) row-and-col)])))
 
 (defn game-over? [board]
-  (> (num-moves-made  board) 5))
+  true)
+  ;(> (num-moves-made  board) 5))
