@@ -1,10 +1,10 @@
 (ns tictactoe.mock-player-spec
   (:use [speclj.core]
         [tictactoe.mock-player]
-        [tictactoe.move-source]))
+        [tictactoe.move-source]
+        [tictactoe.board-utils]))
 
 (describe "mock player"
-  (with player (new-mock-player))
   (with legal-moves (set (for [row (range 3)
                           col (range 3)]
                       [row col])))
@@ -14,24 +14,29 @@
   (with second-board [[:x nil :x]
                       [:o :o  :x]
                       [:x :o  :o]])
+  (with random-behavior (fn [&_] [(rand-int 3) (rand-int 3)]))
+  (with random-behaving-player (new-mock-player @random-behavior :x))
 
 
-  (it "moves randomly and legally"
+  (it "moves randomly and legally, if we tell it to"
     (let [made-moves (set (for [_ (range 5000)]
-                            (next-move @player @first-board)))]
+                            (next-move @random-behaving-player @first-board)))]
       (should= @legal-moves made-moves))
     )
 
   (it "remembers its calls in a queue"
-    (next-move @player @first-board)
-    (should= (list (list "next-move" @first-board)) @(.calls @player))
-    (next-move @player @second-board)
-    (should= (list (list "next-move" @second-board) (list "next-move" @first-board)) @(.calls @player))
+    (next-move @random-behaving-player @first-board)
+    (should= (list (list "next-move" @first-board)) @(.calls @random-behaving-player))
+    (next-move @random-behaving-player @second-board)
+    (should= (list (list "next-move" @second-board) (list "next-move" @first-board)) @(.calls @random-behaving-player))
     )
 
   (it "supports move choice override"
-    (let [illegal-move [8 5]]
-      (binding [mock-decide-move (fn [&_] [8 5])]
-        (should= illegal-move (next-move @player @first-board)))))
+    (let [illegal-move [8 5]
+          moves (fn [&_] illegal-move)
+          illegal-behaving-player (new-mock-player moves :x)]
+        (should= illegal-move (next-move illegal-behaving-player @first-board)))
+    )
+
 
   )

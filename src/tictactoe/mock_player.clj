@@ -1,15 +1,12 @@
 (ns tictactoe.mock-player
   (:use [tictactoe.move-source]))
 
-(defn mock-decide-move [board]
-  [(rand-int 3) (rand-int 3)])
-
-(defrecord MockPlayer [calls]
+(defrecord MockPlayer [calls moves signature]
   MoveSource
   (next-move [this board]
     (reset! calls (conj @calls (list "next-move" board)))
-    (mock-decide-move board)))
+    (moves board)))
 
 
-(defn new-mock-player []
-  (MockPlayer. (atom'())))
+(defn new-mock-player [moves signature]
+  (MockPlayer. (atom'()) moves signature))
