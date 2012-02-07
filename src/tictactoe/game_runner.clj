@@ -6,12 +6,20 @@
 (defn greet []
   (prn "Welcome to tic tac toe"))
 
-(defn main-loop [active-player inactive-player board]
-  (let [active-player-move (next-move active-player board)
+(defn get-move-from-player [player current-board is-re-query?]
+  (if is-re-query?
+    (next-move-with-warning player current-board)
+    (next-move player current-board)))
+
+(defn main-loop [active-player inactive-player board is-re-query?]
+  (let [active-player-move (get-move-from-player active-player board is-re-query?)
         new-board (update-board board active-player-move (.signature active-player))
+        invalid-move (= new-board board)
         continue-game? (not (game-over? new-board))]
     (if continue-game?
-      (recur inactive-player active-player new-board))))
+      (if invalid-move
+        (recur active-player inactive-player new-board invalid-move)
+        (recur inactive-player active-player new-board invalid-move)))))
 
 (defprotocol Playable
   (run-game [this]))
@@ -19,7 +27,7 @@
 (deftype GameRunner [player-1 player-2]
   Playable
   (run-game [this]
-    (main-loop player-1 player-2 empty-board)))
+    (main-loop player-1 player-2 empty-board false)))
 
 (defn new-game-runner [player-1 player-2]
   (GameRunner. player-1 player-2))
