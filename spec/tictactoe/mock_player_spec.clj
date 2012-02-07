@@ -19,7 +19,7 @@
 
 
   (it "moves randomly and legally, if we tell it to"
-    (let [made-moves (set (for [_ (range 5000)]
+    (let [made-moves (set (for [_ (range 30)]
                             (next-move @random-behaving-player @first-board)))]
       (should= @legal-moves made-moves))
     )
