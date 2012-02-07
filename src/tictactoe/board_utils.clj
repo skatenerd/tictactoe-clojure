@@ -12,4 +12,4 @@
 
 
 (defn game-over? [board]
-  (> (num-moves-made  board) 1))
+  (> (num-moves-made  board) 5))

@@ -19,16 +19,16 @@
 
 
   (it "moves randomly and legally, if we tell it to"
-    (let [made-moves (set (for [_ (range 30)]
+    (let [made-moves (set (for [_ (range 60)]
                             (next-move @random-behaving-player @first-board)))]
       (should= @legal-moves made-moves))
     )
 
   (it "remembers its calls in a queue"
     (next-move @random-behaving-player @first-board)
-    (should= (list (list "next-move" @first-board)) @(.calls @random-behaving-player))
+    (should= (list ["next-move" @first-board]) @(.calls @random-behaving-player))
     (next-move @random-behaving-player @second-board)
-    (should= (list (list "next-move" @second-board) (list "next-move" @first-board)) @(.calls @random-behaving-player))
+    (should= (list ["next-move" @second-board] ["next-move" @first-board]) @(.calls @random-behaving-player))
     )
 
   (it "supports move choice override"

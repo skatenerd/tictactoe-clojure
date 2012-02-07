@@ -5,9 +5,10 @@
         [tictactoe.move-source]
         [tictactoe.board-utils :only [empty-board update-board]]))
 
-(describe "game loop"
+(describe "simple game loop"
   (with player-1-first-move [1 1])
   (with player-2-first-move [2 2])
+  (with board-after-first-turn (update-board empty-board @player-1-first-move :x))
   (with player-1 (new-mock-player
                    ;#(case % empty-board @player-1-first-move [(rand-int 3) (rand-int 3)])
                    (fn [board]
@@ -15,7 +16,6 @@
                        @player-1-first-move
                        [(rand-int 3) (rand-int 3)]))
                    :x))
-  (with board-after-first-turn (update-board empty-board @player-1-first-move :x))
   (with player-2 (new-mock-player
                    (fn [board]
                      (if (= board @board-after-first-turn)
@@ -26,8 +26,34 @@
 
 
   (it "prompts the first user for a move, and prompts the second user for a move with updated board"
-      (run-game @game-runner)
-      (should= (list (list "next-move" empty-board)) @(.calls @player-1))
-      (should= (list (list "next-move" @board-after-first-turn)) @(.calls @player-2))))
+    (run-game @game-runner)
+    (should= ["next-move" empty-board] (last @(.calls @player-1)))
+    (should= ["next-move" @board-after-first-turn] (last @(.calls @player-2)))))
+
+(describe "game loop with collisions"
+  (with contention-square [1 1])
+  (with board-after-first-turn (update-board empty-board @contention-square :x))
+  (with player-1 (new-mock-player
+                   (fn [board]
+                     (if (= board empty-board)
+                       @contention-square
+                       [(rand-int 3) (rand-int 3)]))
+                   :x))
+
+  (with player-2 (new-mock-player
+                   (fn [board]
+                     (if (= board @board-after-first-turn)
+                       @contention-square
+                       [(rand-int 3) (rand-int 3)]))
+                   :o))
+  (with game-runner (new-game-runner @player-1 @player-2))
+
+
+  (it "prompts the first user for a move, and prompts the second user for a move with updated board"
+    (run-game @game-runner)
+    (should= ["next-move" empty-board] (last @(.calls @player-1)))
+    (should= ["next-move" @board-after-first-turn] (last @(.calls @player-2)))
+    (should= ["next-move-with-warning" @board-after-first-turn] (last (drop-last @(.calls @player-2))))))
+
 
 

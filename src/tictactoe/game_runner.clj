@@ -9,10 +9,6 @@
 (defn main-loop [active-player inactive-player board]
   (let [active-player-move (next-move active-player board)
         new-board (update-board board active-player-move (.signature active-player))
-;        _ (prn board)
-;        _ (prn active-player)
-;        _ (prn new-board)
-;        _ (prn active-player-move)
         continue-game? (not (game-over? new-board))]
     (if continue-game?
       (recur inactive-player active-player new-board))))
