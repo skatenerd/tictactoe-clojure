@@ -19,8 +19,8 @@
 
 (defn update-board [board posn new-value]
   (if (move-legal board posn)
-    [(assoc-in board posn new-value) true]
-    [board false]))
+    (assoc-in board posn new-value)
+    board))
 
 (defn row-wins [board-size]
   (for [row (range board-size)]

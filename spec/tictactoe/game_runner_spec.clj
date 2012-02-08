@@ -8,7 +8,7 @@
 (describe "simple game loop"
   (with player-1-first-move [1 1])
   (with player-2-first-move [2 2])
-  (with board-after-first-turn (first (update-board empty-board @player-1-first-move :x)))
+  (with board-after-first-turn (update-board empty-board @player-1-first-move :x))
   (with player-1 (new-mock-player
                    ;#(case % empty-board @player-1-first-move [(rand-int 3) (rand-int 3)])
                    (fn [board]

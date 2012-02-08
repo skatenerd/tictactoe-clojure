@@ -5,7 +5,7 @@
 
 (defn main-loop [active-player inactive-player board]
   (let [active-player-move (next-move active-player board)
-        [new-board valid-move?] (update-board board active-player-move (.signature active-player))
+        new-board (update-board board active-player-move (.signature active-player))
         continue-game? (not (game-over? new-board))]
     (if continue-game?
       (recur inactive-player active-player new-board)

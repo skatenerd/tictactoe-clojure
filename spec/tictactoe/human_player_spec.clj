@@ -27,7 +27,7 @@
 
 
 (describe "human player moving with illegal moves"
-  (with center-occupied-board (first (update-board empty-board [1 1] :x)))
+  (with center-occupied-board (update-board empty-board [1 1] :x))
   (with player-1 (new-human-player :o))
   (it "detects collisions"
     (with-in-str "1 1\n1 1\n1 1\n1 2"
