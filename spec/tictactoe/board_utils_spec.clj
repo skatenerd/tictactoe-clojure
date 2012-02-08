@@ -16,6 +16,12 @@
   (with diag-win [[:x nil nil]
                   [nil :x nil]
                   [nil nil :x]])
+  (with x-can-win-diag [[:x nil nil]
+                        [nil :x nil]
+                        [nil nil nil]])
+  (with x-can-win-col [[:x nil :o]
+                       [:x :o nil]
+                       [nil nil nil]])
   (with full-board [[:o :x :o]
                      [:o :x :o]
                      [:o :x :o]])
@@ -70,6 +76,8 @@
       (should= :x (game-winner @col-win))
       (should= :x (game-winner @row-win))
       (should= :x (game-winner @diag-win))
+      (should= :x (game-winner-after-move @x-can-win-diag [2 2] :x))
+      (should= :x (game-winner-after-move @x-can-win-col [2 0] :x))
       (should-not (game-winner @x-in-corner))
       (should-not (game-winner @x-and-o-on-board)))
 

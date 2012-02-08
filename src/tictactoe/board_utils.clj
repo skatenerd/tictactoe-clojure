@@ -51,6 +51,9 @@
 (defn game-winner [board]
   (some #(path-winner % board) (win-paths)))
 
+(defn game-winner-after-move [board move signature]
+  (game-winner (update-board board move signature)))
+
 (defn all-squares [board-size]
   (apply
     concat
