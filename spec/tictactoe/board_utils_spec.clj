@@ -23,8 +23,12 @@
   (context "updating board"
 
   (it "updates a blank board"
-      (should= @x-in-corner (update-board empty-board [0 0] :x))
-      (should= @x-in-corner (update-board @x-in-corner [0 0] :o))))
+      (should= [@x-in-corner true] (update-board empty-board [0 0] :x)))
+
+  (it "tells you when a move is illegal"
+      (should= [@x-in-corner false] (update-board @x-in-corner [0 0] :x))
+      (should= [empty-board false] (update-board empty-board [74 11] :o)))
+    )
 
   (context "check for game over"
     (it "produces diag-win-paths"
@@ -72,7 +76,6 @@
     (it "recognizes a full board"
       (should (board-full? @full-board))
       (should-not (board-full? @col-win)))
-
     )
 
 

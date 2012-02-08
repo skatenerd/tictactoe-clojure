@@ -2,10 +2,25 @@
 
 (def empty-board (vec (repeat 3 (vec (repeat 3 nil)))))
 
+(defn move-within-bounds [board move]
+  (every?
+    #(and
+      (< % (count board))
+      (>= % 0))
+    move))
+
+(defn move-taken [board move]
+  (get-in board move))
+
+(defn move-legal [board move]
+  (and
+    (move-within-bounds board move)
+    (not (move-taken board move))))
+
 (defn update-board [board posn new-value]
-  (if (get-in board posn)
-    board
-    (assoc-in board posn new-value)))
+  (if (move-legal board posn)
+    [(assoc-in board posn new-value) true]
+    [board false]))
 
 (defn row-wins [board-size]
   (for [row (range board-size)]
@@ -51,3 +66,9 @@
   (let [winner (game-winner board)
         full (board-full? board)]
     (or winner full)))
+
+(defn farewell [board]
+  (prn (str "game over, winner was " (game-winner board)))
+  (prn "final board was ")
+  (doseq [row board]
+    (prn row)))
