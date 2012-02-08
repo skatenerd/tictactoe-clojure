@@ -4,7 +4,7 @@
         [tictactoe.move-source]))
 
 (describe "Human player"
-  (with player (new-human-player))
+  (with player (new-human-player :o))
   (with board [[nil :x  nil]
                [nil :o  nil]
                [:x  nil :o]])

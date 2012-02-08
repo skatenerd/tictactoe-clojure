@@ -4,10 +4,12 @@
         [tictactoe.game-runner]))
 
 (defn -main []
-  (let [human (new-human-player)
+  (let [human (new-human-player :o)
         machine (new-mock-player
                   (fn [board]
                     [(rand-int 3) (rand-int 3)])
                   :x)
         runner (new-game-runner machine human)]
     (run-game runner)))
+
+(-main)

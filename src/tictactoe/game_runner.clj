@@ -3,9 +3,6 @@
         [tictactoe.move-source]))
 
 
-(defn greet []
-  (prn "Welcome to tic tac toe"))
-
 (defn get-move-from-player [player current-board is-re-query?]
   (if is-re-query?
     (next-move-with-warning player current-board)

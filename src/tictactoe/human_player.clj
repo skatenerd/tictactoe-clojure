@@ -16,7 +16,7 @@
   (prn "The previous move was invalid")
   (prompt-next-move board))
 
-(deftype HumanIo []
+(deftype HumanIo [signature]
   MoveSource
   (next-move [this board]
     (prompt-next-move board))
@@ -24,5 +24,5 @@
     (prompt-next-move-with-warning this board))
   )
 
-(defn new-human-player []
-  (HumanIo.))
+(defn new-human-player [signature]
+  (HumanIo. signature))
