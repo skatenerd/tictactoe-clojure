@@ -1,5 +1,5 @@
 (ns tictactoe.main
-  (:use [tictactoe.mock-player :only [new-mock-player]]
+  (:use [tictactoe.dumb-ai-player :only [new-dumb-ai-player]]
         [tictactoe.human-player :only [new-human-player]]
         [tictactoe.game-runner]))
 
@@ -7,7 +7,7 @@
 (defn build-player [input signature]
   (case input
     "1"
-    (new-mock-player signature)
+    (new-dumb-ai-player signature)
     "2"
     (new-human-player signature)
     nil))
@@ -31,4 +31,4 @@
         runner (new-game-runner player-1 player-2)]
     (run-game runner)))
 
-(-main)
+;(-main)

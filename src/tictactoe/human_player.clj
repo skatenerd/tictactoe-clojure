@@ -23,11 +23,11 @@
   (println "The previous move was invalid")
   (prompt-next-move board alias))
 
-(deftype HumanIo [signature]
+(deftype HumanPlayer [signature]
   MoveSource
   (next-move [this board]
     (prompt-next-move board signature))
   )
 
 (defn new-human-player [signature]
-  (HumanIo. signature))
+  (HumanPlayer. signature))
