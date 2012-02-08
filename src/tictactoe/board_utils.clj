@@ -1,5 +1,7 @@
 (ns tictactoe.board-utils)
 
+(declare print-board)
+
 (def empty-board (vec (repeat 3 (vec (repeat 3 nil)))))
 
 (defn move-within-bounds [board move]
@@ -67,8 +69,23 @@
         full (board-full? board)]
     (or winner full)))
 
-(defn farewell [board]
-  (prn (str "game over, winner was " (game-winner board)))
-  (prn "final board was ")
+(defn print-row [row]
+  (doseq [square row]
+    (print "|")
+    (if square
+      (print (str square))
+      (print "__")))
+  (println "|"))
+
+(defn print-board [board]
   (doseq [row board]
-    (prn row)))
+    (print-row row)))
+
+(defn farewell [board]
+  (let [winner (game-winner board)]
+    (if winner
+      (println (str "Game over, winner was " (game-winner board)))
+      (println "There was no winner"))
+    )
+  (println "final board was ")
+  (print-board board))
