@@ -73,7 +73,7 @@
   (doseq [square row]
     (print "|")
     (if square
-      (print (str square))
+      (print (str (name square) " "))
       (print "__")))
   (println "|"))
 
