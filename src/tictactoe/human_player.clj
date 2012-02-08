@@ -1,12 +1,13 @@
 (ns tictactoe.human-player
-  (:use [tictactoe.move-source]))
+  (:use [tictactoe.move-source])
+  (:require [clojure.string :as string]))
 
 (defn prompt-next-move [board]
   (prn "Please enter a move.  Current board is:")
   (doseq [row board]
     (prn row))
   (let [input (read-line)
-        splitted (clojure.string/split input #"[,\s]+")
+        splitted (string/split input #"[,\s]+")
         numbers (filter #(not (nil? (re-find #"[0-9]" %))) splitted)
         numbers (map read-string numbers)]
     numbers))

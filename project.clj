@@ -3,4 +3,5 @@
   :dependencies [[org.clojure/clojure "1.2.0"]]
   :dev-dependencies [[speclj "2.1.1"]]
   :test-path "spec/"
+  :main tictactoe.main
 )
