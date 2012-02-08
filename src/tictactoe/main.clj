@@ -1,5 +1,5 @@
 (ns tictactoe.main
-  (:use [tictactoe.dumb-ai-player :only [new-dumb-ai-player]]
+  (:use [tictactoe.smart-ai-player :only [new-smart-ai-player]]
         [tictactoe.human-player :only [new-human-player]]
         [tictactoe.game-runner]))
 
@@ -7,7 +7,7 @@
 (defn build-player [input signature]
   (case input
     "1"
-    (new-dumb-ai-player signature)
+    (new-smart-ai-player signature)
     "2"
     (new-human-player signature)
     nil))

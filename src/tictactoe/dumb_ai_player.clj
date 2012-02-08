@@ -2,7 +2,7 @@
   (:use [tictactoe.move-source]
         [tictactoe.board-utils :only [move-legal]]))
 
-(defrecord DumbAIPlayer [calls moves signature]
+(defrecord DumbAiPlayer [calls moves signature]
   MoveSource
   (next-move [this board]
     (reset! calls (conj @calls ["next-move" board]))
@@ -19,6 +19,6 @@
 
 (defn new-dumb-ai-player
   ([moves signature]
-   (DumbAIPlayer. (atom '()) moves signature))
+   (DumbAiPlayer. (atom '()) moves signature))
   ([signature]
-   (DumbAIPlayer. (atom '()) random-legal-move signature)))
+   (DumbAiPlayer. (atom '()) random-legal-move signature)))
