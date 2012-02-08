@@ -7,15 +7,18 @@
                      [nil nil nil]
                      [nil nil nil]])
   (with x-and-o-on-board (assoc-in @x-in-corner [1 1] :o))
-  (with row-loss [[:x :x :x]
-                  [nil nil nil]
-                  [nil nil nil]])
-  (with col-loss [[:x nil nil]
-                  [:x nil nil]
-                  [:x nil nil]])
-  (with diag-loss [[:x nil nil]
-                   [nil :x nil]
-                   [nil nil :x]])
+  (with row-win [[:x :x :x]
+                 [nil nil nil]
+                 [nil nil nil]])
+  (with col-win [[:x nil nil]
+                 [:x nil nil]
+                 [:x nil nil]])
+  (with diag-win [[:x nil nil]
+                  [nil :x nil]
+                  [nil nil :x]])
+  (with full-board [[:o :x :o]
+                     [:o :x :o]
+                     [:o :x :o]])
 
   (context "updating board"
 
@@ -46,17 +49,31 @@
     (it "checks correctly for a win on the first row"
       (let [top-row-win-path (first (row-wins 3))
             diag-win-path (first (diag-wins 3))]
-        (should (is-winning-path top-row-win-path @top-row-win))
-        (should-not (is-winning-path diag-win-path @top-row-win))))
+        (should (path-winner top-row-win-path @row-win))
+        (should-not (path-winner diag-win-path @row-win))))
+
+    (it "checks correctly for a diagonal win"
+      (let [diag-win-path (first (diag-wins 3))
+            top-row-win-path (first (row-wins 3))]
+        (should (path-winner diag-win-path @diag-win))
+        (should-not (path-winner top-row-win-path @diag-win))))
 
     (it "says a game with two moves is not over"
-      (prn (row-wins 3))
-      (prn (col-wins 3))
       (should-not (game-over? @x-in-corner))
-      (should-not (game-over? @x-and-o-on-board))
-      (should (game-over? @col-loss))
-      (should (game-over? @row-loss))
-      (should (game-over? @diag-loss))))
+      (should-not (game-over? @x-and-o-on-board)))
+  
+    (it "recognizes row, diag, and col winners"
+      (should= :x (game-winner @col-win))
+      (should= :x (game-winner @row-win))
+      (should= :x (game-winner @diag-win))
+      (should-not (game-winner @x-in-corner))
+      (should-not (game-winner @x-and-o-on-board)))
+
+    (it "recognizes a full board"
+      (should (board-full? @full-board))
+      (should-not (board-full? @col-win)))
+
+    )
 
 
 

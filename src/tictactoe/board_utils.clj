@@ -17,11 +17,6 @@
     (for [row (range board-size)]
       [row col])))
 
-(defn is-winning-path [path board]
-  (let [board-residents (map #(get-in board %) path)]
-    (prn board-residents)
-    ))
-
 (defn diag-wins [board-size]
   (list
     (for [row-and-col (range board-size)]
@@ -29,6 +24,30 @@
     (for [row-and-col (range board-size)]
       [row-and-col (- (dec board-size) row-and-col)])))
 
+(defn path-winner [path board]
+  (let [board-residents (map #(get-in board %) path)]
+    (reduce #(if (= %1 %2) %1) board-residents)))
+
+(defn win-paths []
+  (concat (row-wins 3) (col-wins 3) (diag-wins 3)))
+
+(defn game-winner [board]
+  (some #(path-winner % board) (win-paths)))
+
+(defn all-squares [board-size]
+  (apply
+    concat
+    (for [row (range board-size)]
+      (for [col (range board-size)]
+        [row col]))))
+
+(defn empty-squares [board]
+  (filter #(nil? (get-in board %)) (all-squares (count board))))
+
+(defn board-full? [board]
+  (empty? (empty-squares board)))
+
 (defn game-over? [board]
-  true)
-  ;(> (num-moves-made  board) 5))
+  (let [winner (game-winner board)
+        full (board-full? board)]
+    (or winner full)))

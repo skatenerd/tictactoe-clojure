@@ -53,8 +53,6 @@
     (run-game @game-runner)
     (should= ["next-move" empty-board] (last @(.calls @player-1)))
     (should= ["next-move" @board-after-first-turn] (last @(.calls @player-2)))
-    (prn @(.calls @player-2))
-    (prn (last (drop-last @(.calls @player-2))))
     (should= ["next-move-with-warning" @board-after-first-turn] (last (drop-last @(.calls @player-2))))))
 
 
