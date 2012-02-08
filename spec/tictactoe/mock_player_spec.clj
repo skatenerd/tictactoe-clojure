@@ -11,17 +11,22 @@
   (with first-board [[:x nil :x]
                      [:o :o nil]
                      [:x :o nil]])
+  (with first-board-remaining-moves
+    (set [[0 1] [1 2] [2 2]]))
   (with second-board [[:x nil :x]
                       [:o :o  :x]
                       [:x :o  :o]])
-  (with random-behavior (fn [&_] [(rand-int 3) (rand-int 3)]))
-  (with random-behaving-player (new-mock-player @random-behavior :x))
+  (with random-behaving-player (new-mock-player :x))
 
 
   (it "moves randomly and legally, if we tell it to"
     (let [made-moves (set (for [_ (range 60)]
-                            (next-move @random-behaving-player @first-board)))]
+                            (next-move @random-behaving-player empty-board)))]
       (should= @legal-moves made-moves))
+
+    (let [made-moves (set (for [_ (range 60)]
+                            (next-move @random-behaving-player @first-board)))]
+      (should= @first-board-remaining-moves made-moves))
     )
 
   (it "remembers its calls in a queue"
