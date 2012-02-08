@@ -15,11 +15,12 @@
         (should= [1 1] (next-move @player @board))))
 
     (it "reads comma separated user input"
-      (binding [read-line (fn [] "1, 1")]
+      (with-in-str
+        "1, 1"
         (should= [1 1] (next-move @player @board)))
-      (binding [read-line (fn [] "1,1")]
+      (with-in-str "1,1"
         (should= [1 1] (next-move @player @board))))
 
     (it "reads convoluted user input"
-      (binding [read-line (fn [] "row 2 and column 1")]
+      (with-in-str "row 2 and column 1"
         (should= [2 1] (next-move @player @board))))))
