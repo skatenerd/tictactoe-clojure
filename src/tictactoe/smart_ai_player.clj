@@ -30,17 +30,17 @@
     :o
     :x))
 
+(defn score-board-from-opponent-perspective [player intended-winner]
+  #(score-board
+      %
+      (other-player player)
+      intended-winner))
 
 (defn simulate-dumb-player-score-assignment [player intended-winner achievable-boards]
   (let
-    [score-board-from-opponent-perspective
-     #(score-board
-        %
-        (other-player player)
-        intended-winner)
-     scores-of-future-boards
+    [scores-of-future-boards
      (map
-       score-board-from-opponent-perspective
+       (score-board-from-opponent-perspective player intended-winner)
        achievable-boards)]
     (if (contains? (set scores-of-future-boards) -1)
       -1
@@ -49,16 +49,11 @@
 
 (defn maximize-score-rationally [player intended-winner achievable-boards]
   (let
-    [score-board-from-opponent-perspective
-     #(score-board
-        %
-        (other-player player)
-        intended-winner)
-     best-achievable-score
+    [best-achievable-score
      (apply
       max
       (map
-        score-board-from-opponent-perspective
+        (score-board-from-opponent-perspective player intended-winner)
         achievable-boards))]
     best-achievable-score))
 
@@ -90,7 +85,8 @@
   (next-move [this board]
     (let [possible-moves (empty-squares board)
           score-move-fn #(score-move board % signature)
-          optimal-move (max-key
+          optimal-move (apply
+                          max-key
                           score-move-fn
                           possible-moves)]
       optimal-move)))
