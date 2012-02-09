@@ -36,16 +36,21 @@
       (other-player player)
       intended-winner))
 
-(defn simulate-dumb-player-score-assignment [player intended-winner achievable-boards]
+(defn compute-score-as-human [scores-of-future-boards]
+  (if (contains? (set scores-of-future-boards) -1)
+    -1
+    (/ (count (filter #(= % 1) scores-of-future-boards))
+      (count scores-of-future-boards)))
+  )
+
+(defn minimize-score-as-human [player intended-winner achievable-boards]
   (let
     [scores-of-future-boards
      (map
        (score-board-from-opponent-perspective player intended-winner)
        achievable-boards)]
-    (if (contains? (set scores-of-future-boards) -1)
-      -1
-      (/ (count (filter #(= % 1) scores-of-future-boards))
-        (count scores-of-future-boards)))))
+    (compute-score-as-human scores-of-future-boards)
+    ))
 
 (defn maximize-score-rationally [player intended-winner achievable-boards]
   (let
@@ -60,7 +65,7 @@
 (defn score-by-thinking-ahead [player intended-winner achievable-boards]
   (if (= player intended-winner)
     (maximize-score-rationally player intended-winner achievable-boards)
-    (simulate-dumb-player-score-assignment player intended-winner achievable-boards)))
+    (minimize-score-as-human player intended-winner achievable-boards)))
 
 
 (defn score-board [board player intended-winner]
