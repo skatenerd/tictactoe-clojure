@@ -54,12 +54,13 @@
         %
         (other-player player)
         intended-winner)
-     best-next-board
+     best-achievable-score
      (apply
-      max-key
-      score-board-from-opponent-perspective
-      achievable-boards)]
-    (score-board-from-opponent-perspective best-next-board)))
+      max
+      (map
+        score-board-from-opponent-perspective
+        achievable-boards))]
+    best-achievable-score))
 
 (defn score-by-thinking-ahead [player intended-winner achievable-boards]
   (if (= player intended-winner)
@@ -79,14 +80,6 @@
       0
       :else
       (score-by-thinking-ahead player intended-winner achievable-boards))))
-;      (let [best-next-board (best-next-board-for-player
-;                              next-boards
-;                              player
-;                              intended-winner)]
-;        (score-board
-;          best-next-board
-;          (other-player player)
-;          intended-winner)))))
 
 (defn score-move [board move player]
   (let [resulting-board (update-board board move player)]
@@ -95,13 +88,12 @@
 (deftype SmartAiPlayer [signature]
   MoveSource
   (next-move [this board]
-    (let [score-of-board (score-board board signature signature)
-          optimal-moves (filter
-                          #(=
-                             (score-move board % signature)
-                             score-of-board)
-                          (empty-squares board))]
-      (first optimal-moves))))
+    (let [possible-moves (empty-squares board)
+          score-move-fn #(score-move board % signature)
+          optimal-move (max-key
+                          score-move-fn
+                          possible-moves)]
+      optimal-move)))
 
 
 (defn new-smart-ai-player [signature]

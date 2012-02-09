@@ -1,7 +1,8 @@
 (ns tictactoe.smart-ai-player-spec
   (:use [speclj.core]
         [tictactoe.smart-ai-player]
-        [tictactoe.move-source]))
+        [tictactoe.move-source]
+        [tictactoe.board-utils :only [empty-board]]))
 
 (describe "basic intelligence"
   (with smart-ai-player (new-smart-ai-player :x))
@@ -60,7 +61,9 @@
 
     (it "recognizes ties, with potential for throwing game"
       (should= 0 (score-board @tie :o :x))
-      (should= (/ 1 2) (score-board @tie :o :o)))
+      (should= (/ 1 2) (score-board @tie :o :o))
+      ;(should (pos? (score-board empty-board :x :x)))
+      )
 
 
 
