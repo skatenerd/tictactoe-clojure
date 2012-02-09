@@ -58,9 +58,9 @@
       (should= 1 (score-board @x-can-win-smart :x :x))
       )
 
-    (it "recognizes ties"
+    (it "recognizes ties, with potential for throwing game"
       (should= 0 (score-board @tie :o :x))
-      (should= 0 (score-board @tie :o :o)))
+      (should= (/ 1 2) (score-board @tie :o :o)))
 
 
 
