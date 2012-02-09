@@ -23,12 +23,21 @@
                          [:x nil nil]
                          [:o nil nil]])
 
+  (with x-can-win-really-smart [[:x  nil :o ]
+                                [nil nil nil]
+                                [nil nil nil]])
+
+  (with tie [[:o :x  nil]
+             [:x nil :o]
+             [:o nil :x ]])
+
   (it "recognizes imminent victories"
     (should= [0 2] (next-move @smart-ai-player @x-can-win-row))
     (should= [2 0] (next-move @smart-ai-player @x-can-win-col)))
 
   (it "recognizes distant victories"
-    (should= [1 1] (next-move @smart-ai-player @x-can-win-row))
+    (should= [1 1] (next-move @smart-ai-player @x-can-win-smart))
+    (should (contains? #{[2 0] [2 2] [1 0]}  (next-move @smart-ai-player @x-can-win-really-smart)))
     )
 
   (context "scoring the board"
@@ -45,4 +54,25 @@
       (should= -1 (score-board @x-can-win-col :x :o))
     )
 
-  ))
+    (it "scores based on distant victor"
+      (should= 1 (score-board @x-can-win-smart :x :x))
+      )
+
+    (it "recognizes ties"
+      (should= 0 (score-board @tie :o :x))
+      (should= 0 (score-board @tie :o :o)))
+
+
+
+  )
+  (context "scoring a move"
+    (it "scores a winning move"
+      (should= 1 (score-move @x-can-win-row [0 2] :x)))
+    (it "scores a distantly winning move"
+      (should= 1 (score-move @x-can-win-smart [1 1] :x))
+      (should= -1 (score-move @x-can-win-smart [0 2] :x))
+      )
+
+    )
+
+  )

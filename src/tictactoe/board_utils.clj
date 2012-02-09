@@ -64,6 +64,11 @@
 (defn empty-squares [board]
   (filter #(nil? (get-in board %)) (all-squares (count board))))
 
+(defn potential-next-boards [board player]
+  (map
+    #(update-board board % player)
+    (empty-squares board)))
+
 (defn board-full? [board]
   (empty? (empty-squares board)))
 
