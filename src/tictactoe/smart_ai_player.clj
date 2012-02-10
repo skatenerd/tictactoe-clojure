@@ -30,6 +30,9 @@
     :o
     :x))
 
+(defn add-to-cache [cache board player score]
+  (conj cache {[board player] score}))
+
 (defn score-board-from-opponent-perspective [player intended-winner cached-scores]
   #(score-board
       %
@@ -47,20 +50,22 @@
 (defn minimize-score-as-human [player intended-winner achievable-boards cached-scores]
   (let
     [scores-and-caches-of-future-boards
-     (vec (map
+     (map
        (score-board-from-opponent-perspective player intended-winner cached-scores)
-       achievable-boards))
-     scores-of-future-boards (vec (map first scores-and-caches-of-future-boards))]
+       achievable-boards)
+     scores-of-future-boards (map first scores-and-caches-of-future-boards)
+     caches-of-future-boards (map second scores-and-caches-of-future-boards)]
     [(compute-score-as-human scores-of-future-boards) {}]
     ))
 
 (defn maximize-score-rationally [player intended-winner achievable-boards cached-scores]
   (let
     [scores-and-caches-of-future-boards
-     (vec (map
+     (map
        (score-board-from-opponent-perspective player intended-winner cached-scores)
-       achievable-boards))
-     scores-of-future-boards (map first scores-and-caches-of-future-boards)]
+       achievable-boards)
+     scores-of-future-boards (map first scores-and-caches-of-future-boards)
+     caches-of-future-boards (map second scores-and-caches-of-future-boards)]
     [(apply max scores-of-future-boards) {}]))
 
 (defn score-by-thinking-ahead [player intended-winner achievable-boards cached-scores]
@@ -68,17 +73,28 @@
     (maximize-score-rationally player intended-winner achievable-boards cached-scores)
     (minimize-score-as-human player intended-winner achievable-boards cached-scores)))
 
+(defn score-and-cache-for-computed-winner [board player winner intended-winner]
+  (let [score (get-score-from-winner intended-winner winner)]
+    [score (add-to-cache {} board player score)]))
+
 
 (defn score-board [board player intended-winner cached-scores]
-  (let [winner
+  (let [looked-up-winner
+        (cached-scores [board player])
+        computed-winner
         (game-winner board)
         achievable-boards
         (potential-next-boards board player)]
     (cond
-      winner
-      [(get-score-from-winner intended-winner winner) cached-scores]
+      looked-up-winner
+      looked-up-winner
+      computed-winner
+      (score-and-cache-for-computed-winner board player computed-winner intended-winner)
       (empty? achievable-boards)
-      [0 cached-scores]
+      [0 (->
+        {}
+        (add-to-cache board player 0)
+        (add-to-cache board (other-player player) 0))]
       :else
       (score-by-thinking-ahead player intended-winner achievable-boards cached-scores))))
 
