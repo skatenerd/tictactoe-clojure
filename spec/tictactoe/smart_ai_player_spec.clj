@@ -28,6 +28,10 @@
                                 [nil nil nil]
                                 [nil nil nil]])
 
+  (with cymen-board [[:x nil :o]
+                     [:o nil nil]
+                     [:x nil nil]])
+
   (with tie [[:o :x  nil]
              [:x nil :o]
              [:o nil :x ]])
@@ -41,39 +45,41 @@
     (should (contains? #{[2 0] [2 2] [1 0]}  (next-move @smart-ai-player @x-can-win-really-smart)))
     )
 
+  (it "does cymen's board correctly"
+    (should= [2 2] (next-move @smart-ai-player @cymen-board))
+
+    )
+
   (context "scoring the board"
     (it "scores based on current victor"
-      (should= 1 (score-board @x-won-row :x :x))
-      (should= -1 (score-board @x-won-row :x :o))
-      (should= 1 (score-board @x-won-col :x :x))
-      (should= -1 (score-board @x-won-col :x :o)))
+      (should= 1 (first (score-board @x-won-row :x :x {})))
+      (should= -1 (first (score-board @x-won-row :x :o {})))
+      (should= 1 (first (score-board @x-won-col :x :x {})))
+      (should= -1 (first (score-board @x-won-col :x :o {}))))
 
     (it "scores based on immediate victor"
-      (should= 1 (score-board @x-can-win-row :x :x))
-      (should= -1 (score-board @x-can-win-row :x :o))
-      (should= 1 (score-board @x-can-win-col :x :x))
-      (should= -1 (score-board @x-can-win-col :x :o))
+      (should= 1 (first (score-board @x-can-win-row :x :x {})))
+      (should= -1 (first (score-board @x-can-win-row :x :o {})))
+      (should= 1 (first (score-board @x-can-win-col :x :x {})))
+      (should= -1 (first (score-board @x-can-win-col :x :o {})))
     )
 
     (it "scores based on distant victor"
-      (should= 1 (score-board @x-can-win-smart :x :x))
+      (should= 1 (first (score-board @x-can-win-smart :x :x {})))
       )
 
     (it "recognizes ties, with potential for throwing game"
-      (should= 0 (score-board @tie :o :x))
-      (should= (/ 1 2) (score-board @tie :o :o))
-      ;(should (pos? (score-board empty-board :x :x)))
+      (should= 0 (first (score-board @tie :o :x {})))
+      (should= (/ 1 2) (first (score-board @tie :o :o {})))
+      ;(should (pos? (first (score-board empty-board :x :x {}))))
       )
-
-
-
-  )
+)
   (context "scoring a move"
     (it "scores a winning move"
-      (should= 1 (score-move @x-can-win-row [0 2] :x)))
+      (should= 1 (first (score-move @x-can-win-row [0 2] :x))))
     (it "scores a distantly winning move"
-      (should= 1 (score-move @x-can-win-smart [1 1] :x))
-      (should= -1 (score-move @x-can-win-smart [0 2] :x))
+      (should= 1 (first (score-move @x-can-win-smart [1 1] :x)))
+      (should= -1 (first (score-move @x-can-win-smart [0 2] :x)))
       )
 
     )

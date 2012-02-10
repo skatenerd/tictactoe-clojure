@@ -30,11 +30,12 @@
     :o
     :x))
 
-(defn score-board-from-opponent-perspective [player intended-winner]
+(defn score-board-from-opponent-perspective [player intended-winner cached-scores]
   #(score-board
       %
       (other-player player)
-      intended-winner))
+      intended-winner
+      cached-scores))
 
 (defn compute-score-as-human [scores-of-future-boards]
   (if (contains? (set scores-of-future-boards) -1)
@@ -43,53 +44,53 @@
       (count scores-of-future-boards)))
   )
 
-(defn minimize-score-as-human [player intended-winner achievable-boards]
+(defn minimize-score-as-human [player intended-winner achievable-boards cached-scores]
   (let
-    [scores-of-future-boards
-     (map
-       (score-board-from-opponent-perspective player intended-winner)
-       achievable-boards)]
-    (compute-score-as-human scores-of-future-boards)
+    [scores-and-caches-of-future-boards
+     (vec (map
+       (score-board-from-opponent-perspective player intended-winner cached-scores)
+       achievable-boards))
+     scores-of-future-boards (vec (map first scores-and-caches-of-future-boards))]
+    [(compute-score-as-human scores-of-future-boards) {}]
     ))
 
-(defn maximize-score-rationally [player intended-winner achievable-boards]
+(defn maximize-score-rationally [player intended-winner achievable-boards cached-scores]
   (let
-    [best-achievable-score
-     (apply
-      max
-      (map
-        (score-board-from-opponent-perspective player intended-winner)
-        achievable-boards))]
-    best-achievable-score))
+    [scores-and-caches-of-future-boards
+     (vec (map
+       (score-board-from-opponent-perspective player intended-winner cached-scores)
+       achievable-boards))
+     scores-of-future-boards (map first scores-and-caches-of-future-boards)]
+    [(apply max scores-of-future-boards) {}]))
 
-(defn score-by-thinking-ahead [player intended-winner achievable-boards]
+(defn score-by-thinking-ahead [player intended-winner achievable-boards cached-scores]
   (if (= player intended-winner)
-    (maximize-score-rationally player intended-winner achievable-boards)
-    (minimize-score-as-human player intended-winner achievable-boards)))
+    (maximize-score-rationally player intended-winner achievable-boards cached-scores)
+    (minimize-score-as-human player intended-winner achievable-boards cached-scores)))
 
 
-(defn score-board [board player intended-winner]
+(defn score-board [board player intended-winner cached-scores]
   (let [winner
         (game-winner board)
         achievable-boards
         (potential-next-boards board player)]
     (cond
       winner
-      (get-score-from-winner intended-winner winner)
+      [(get-score-from-winner intended-winner winner) cached-scores]
       (empty? achievable-boards)
-      0
+      [0 cached-scores]
       :else
-      (score-by-thinking-ahead player intended-winner achievable-boards))))
+      (score-by-thinking-ahead player intended-winner achievable-boards cached-scores))))
 
 (defn score-move [board move player]
   (let [resulting-board (update-board board move player)]
-    (score-board resulting-board (other-player  player) player)))
+    (score-board resulting-board (other-player  player) player {})))
 
 (deftype SmartAiPlayer [signature]
   MoveSource
   (next-move [this board]
     (let [possible-moves (empty-squares board)
-          score-move-fn #(score-move board % signature)
+          score-move-fn #(first (score-move board % signature))
           optimal-move (apply
                           max-key
                           score-move-fn
