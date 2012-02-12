@@ -62,41 +62,41 @@
 
   (context "scoring the board"
     (it "scores based on current victor"
-      (should= -1 (first (score-board @x-won-row :x :o {})))
-      (should= 1 (first (score-board @x-won-col :x :x {})))
-      (should= -1 (first (score-board @x-won-col :x :o {}))))
+      (should= -1 (first (evaluate-board @x-won-row :x :o {})))
+      (should= 1 (first (evaluate-board @x-won-col :x :x {})))
+      (should= -1 (first (evaluate-board @x-won-col :x :o {}))))
 
     (it "scores based on immediate victor"
-      (should= 1 (first (score-board @x-can-win-row :x :x {})))
-      (should= -1 (first (score-board @x-can-win-row :x :o {})))
-      (should= 1 (first (score-board @x-can-win-col :x :x {})))
-      (should= -1 (first (score-board @x-can-win-col :x :o {})))
+      (should= 1 (first (evaluate-board @x-can-win-row :x :x {})))
+      (should= -1 (first (evaluate-board @x-can-win-row :x :o {})))
+      (should= 1 (first (evaluate-board @x-can-win-col :x :x {})))
+      (should= -1 (first (evaluate-board @x-can-win-col :x :o {})))
       )
 
     (it "scores based on distant victor"
-      (should= 1 (first (score-board @x-can-win-smart :x :x {}))))
+      (should= 1 (first (evaluate-board @x-can-win-smart :x :x {}))))
 
     (it "recognizes current ties"
-      (should= 0 (first (score-board @current-tie :x :x {}))))
+      (should= 0 (first (evaluate-board @current-tie :x :x {}))))
 
     (it "recognizes guaranteed-ties"
-      (should= 0 (first (score-board @guaranteed-tie :o :x {})))
+      (should= 0 (first (evaluate-board @guaranteed-tie :o :x {})))
     )
     (it "recognizes potential for opponent to throw game"
-     (should= (/ 1 2) (first (score-board @guaranteed-tie :o :o {}))))
+     (should= (/ 1 2) (first (evaluate-board @guaranteed-tie :o :o {}))))
   )
 
   (context "caching board scores"
     (it "caches a win when it encounters one"
-    (let [[score new-cached-situations] (score-board @x-won-row :x :x {})]
+    (let [[score new-cached-situations] (evaluate-board @x-won-row :x :x {})]
       (should= {[@x-won-row :x] 1} new-cached-situations)))
 
     (it "recognizes current ties"
-      (let [[score learned-info] (score-board @current-tie :x :x {})]
+      (let [[score learned-info] (evaluate-board @current-tie :x :x {})]
         (should= {[@current-tie :x] 0 [@current-tie :o] 0} learned-info)))
 
     (it "recognizes guaranteed-ties, with potential for throwing game"
-      (let [[score learned-info] (score-board @guaranteed-tie :o :x {})]
+      (let [[score learned-info] (evaluate-board @guaranteed-tie :o :x {})]
         (should= {[@guaranteed-tie :o] 0} learned-info))
       )
 
@@ -106,10 +106,10 @@
 
   (context "scoring a move"
     (it "scores a winning move"
-      (should= 1 (first (evaluate-move @x-can-win-row [0 2] :x))))
+      (should= 1 (first (evaluate-move @x-can-win-row [0 2] :x {} :x))))
     (it "scores a distantly winning move"
-      (should= 1 (first (evaluate-move @x-can-win-smart [1 1] :x)))
-      (should= -1 (first (evaluate-move @x-can-win-smart [0 2] :x))))
+      (should= 1 (first (evaluate-move @x-can-win-smart [1 1] :x {} :x)))
+      (should= -1 (first (evaluate-move @x-can-win-smart [0 2] :x {} :x))))
 
     )
 
