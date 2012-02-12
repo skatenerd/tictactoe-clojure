@@ -72,7 +72,6 @@
 
       (it "recognizes guaranteed-ties"
         (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (prn (evaluate-board (new-game-state @guaranteed-tie :o) {}))
           (should= 0 (first (evaluate-board (new-game-state @guaranteed-tie :o) {})))))
 
       (it "recognizes current ties"
