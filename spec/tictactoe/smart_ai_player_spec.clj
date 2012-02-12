@@ -4,11 +4,14 @@
         [tictactoe.move-source]
         [tictactoe.board-utils :only [empty-board]]))
 
-(describe "basic intelligence"
+(describe "scoring boards and generating moves: "
+
   (with smart-ai-player (new-smart-ai-player :x))
+
   (with x-won-row [[:x :x :x]
                    [:o :o nil]
                    [:x :o nil]])
+
   (with x-won-col [[:x   nil :o]
                    [:x   :o  nil]
                    [:x nil nil]])
@@ -16,6 +19,7 @@
   (with x-can-win-row [[:x :x nil]
                        [:o :o nil]
                        [:x :o nil]])
+
   (with x-can-win-col [[:x   nil :o]
                        [:x   :o  nil]
                        [nil nil nil]])
@@ -40,25 +44,24 @@
                         [:x nil :o]
                         [:o nil :x ]])
 
-  (it "recognizes imminent victories"
-    (should= [0 2] (next-move @smart-ai-player @x-can-win-row))
-    (should= [2 0] (next-move @smart-ai-player @x-can-win-col)))
+  (context "generating moves"
 
-  (it "recognizes distant victories"
-    (should= [1 1] (next-move @smart-ai-player @x-can-win-smart))
-    (should (contains? #{[2 0] [2 2] [1 0]}  (next-move @smart-ai-player @x-can-win-really-smart)))
+    (it "moves based on imminent victories"
+      (should= [0 2] (next-move @smart-ai-player @x-can-win-row))
+      (should= [2 0] (next-move @smart-ai-player @x-can-win-col)))
+
+    (it "moves based on distant guaranteed victories"
+      (should= [1 1] (next-move @smart-ai-player @x-can-win-smart))
+      (should (contains? #{[2 0] [2 2] [1 0]}  (next-move @smart-ai-player @x-can-win-really-smart)))
+      )
+
+    (it "moves correctly with cymen's board"
+      (should= [2 2] (next-move @smart-ai-player @cymen-board)))
+
     )
-
-  (it "does cymen's board correctly"
-    (should= [2 2] (next-move @smart-ai-player @cymen-board)))
 
   (context "scoring the board"
     (it "scores based on current victor"
-
-      (let [[score learned-info] (score-board @x-won-row :x :x {})]
-        (should= 1 score)
-        (should= {[@x-won-row :x] 1} learned-info))
-
       (should= -1 (first (score-board @x-won-row :x :o {})))
       (should= 1 (first (score-board @x-won-col :x :x {})))
       (should= -1 (first (score-board @x-won-col :x :o {}))))
@@ -68,56 +71,84 @@
       (should= -1 (first (score-board @x-can-win-row :x :o {})))
       (should= 1 (first (score-board @x-can-win-col :x :x {})))
       (should= -1 (first (score-board @x-can-win-col :x :o {})))
-    )
+      )
 
     (it "scores based on distant victor"
-      (should= 1 (first (score-board @x-can-win-smart :x :x {})))
-      )
+      (should= 1 (first (score-board @x-can-win-smart :x :x {}))))
+
+    (it "recognizes current ties"
+      (should= 0 (first (score-board @current-tie :x :x {}))))
+
+    (it "recognizes guaranteed-ties"
+      (should= 0 (first (score-board @guaranteed-tie :o :x {})))
+    )
+    (it "recognizes potential for opponent to throw game"
+     (should= (/ 1 2) (first (score-board @guaranteed-tie :o :o {}))))
+  )
+
+  (context "caching board scores"
+    (it "caches a win when it encounters one"
+    (let [[score new-cached-situations] (score-board @x-won-row :x :x {})]
+      (should= {[@x-won-row :x] 1} new-cached-situations)))
 
     (it "recognizes current ties"
       (let [[score learned-info] (score-board @current-tie :x :x {})]
-        (should= 0 score)
         (should= {[@current-tie :x] 0 [@current-tie :o] 0} learned-info)))
 
     (it "recognizes guaranteed-ties, with potential for throwing game"
       (let [[score learned-info] (score-board @guaranteed-tie :o :x {})]
-        (should= 0 score)
         (should= {[@guaranteed-tie :o] 0} learned-info))
-      (should= (/ 1 2) (first (score-board @guaranteed-tie :o :o {})))
-      )
-)
-  (context "scoring a move"
-    (it "scores a winning move"
-      (should= 1 (first (score-move @x-can-win-row [0 2] :x))))
-    (it "scores a distantly winning move"
-      (should= 1 (first (score-move @x-can-win-smart [1 1] :x)))
-      (should= -1 (first (score-move @x-can-win-smart [0 2] :x)))
       )
 
+
+
     )
+
+  (context "scoring a move"
+    (it "scores a winning move"
+      (should= 1 (first (evaluate-move @x-can-win-row [0 2] :x))))
+    (it "scores a distantly winning move"
+      (should= 1 (first (evaluate-move @x-can-win-smart [1 1] :x)))
+      (should= -1 (first (evaluate-move @x-can-win-smart [0 2] :x))))
+
+    )
+
 ;  (context "scoring a collection of moves"
 ;    (it "evaluates scores on an empty collection of boards"
 ;      (let [mock-cache {:a :b}]
 ;        (should=
-;          {:mock-cache mock-cache
-;                  :learned-situations {}
-;                  :scores []}
-;          (evaluate-and-cache-boards boards mock-cache))))
+;          {:total-cache mock-cache
+;           :learned-situations {}
+;           :scores []}
+;          (evaluate-and-cache-boards [] mock-cache :x))))
 ;    (it "evaluates score of one board"
 ;      (let [mock-cache {:a :b}
 ;            learned-situation {[@current-tie :x] 0}
 ;            updated-cache (conj mock-cache learned-situation)]
 ;            (should=
-;              {:mock-cache updated-cache
-;                      :learned-situations learned-situatio
-;                      :scores [0]}
-;              (evaluate-and-cache-boards mock-cache)))))
-
+;              {:total-cache updated-cache
+;               :learned-situations learned-situation
+;               :scores [0]}
+;              (evaluate-and-cache-boards [@current-tie] mock-cache :x))))
+;    (it "evaluates score of multiple boards"
+;      (let [mock-cache {:a :b}
+;            learned-situations {[@current-tie :x] 0
+;                                [@x-won-row :x] 1}
+;            updated-cache (merge mock-cache learned-situations)]
+;            (should=
+;              {:total-cache updated-cache
+;               :learned-situations learned-situations
+;               :scores [0 1]}
+;              (evaluate-and-cache-boards [@current-tie @x-won-row] mock-cache :x)))))
   )
 
 (describe "utilities"
   (it "adds to cache correctly"
     (should= {[:x :y] 24} (add-to-cache {} :x :y 24))
     )
+
+  (it "computes other player correctly"
+    (should= :x (other-player :o))
+    (should= :o (other-player :x)))
 
   )

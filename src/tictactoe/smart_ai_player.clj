@@ -6,7 +6,36 @@
                                       game-winner-after-move
                                       update-board]]))
 
-(declare score-board)
+(declare score-board evaluate-move compute-next-move-as-player)
+
+
+(deftype SmartAiPlayer [signature]
+  MoveSource
+  (next-move [this board]
+    (compute-next-move-as-player signature board))
+  )
+
+(defn new-smart-ai-player [signature]
+  (SmartAiPlayer. signature))
+
+
+
+
+
+
+(defn compute-next-move-as-player [signature board]
+  (let [possible-moves (empty-squares board)
+        evaluate-move-with-fixed-board #(first (evaluate-move board % signature))
+        optimal-move (apply
+      max-key
+      evaluate-move-with-fixed-board
+      possible-moves)]
+    optimal-move)
+
+  )
+
+
+
 
 (defn winning-next-moves [board signature]
   (let [next-moves (empty-squares board)]
@@ -73,9 +102,22 @@
     (maximize-score-rationally player intended-winner achievable-boards cached-scores)
     (minimize-score-as-human player intended-winner achievable-boards cached-scores)))
 
-(defn score-and-cache-for-computed-winner [board player winner intended-winner]
-  (let [score (get-score-from-winner intended-winner winner)]
-    [score (add-to-cache {} board player score)]))
+;(defn- score-board-and-update-caches [player intended-winner {:keys [total-cache learned-situations scores]} board]
+;  (let [[score new-situations-to-record] (score-board board player total-cache)]
+;    {:total-cache (conj total-cache new-situations-to-record)
+;     :learned-situations new-situations-to-record
+;     :scores (conj scores score)}))
+;
+;(defn- score-board-and-update-caches-as-player [player intended-winner]
+;  (partial score-board-and-update-caches player intended-winner))
+;
+;(defn evaluate-and-cache-boards [boards cache current-player intended-winner]
+;  (reduce
+;    (score-board-and-update-caches-as-player (other-player current-player) intended-winner)
+;    {:total-cache mock-cache
+;     :learned-situations {}
+;     :scores []}
+;    boards))
 
 
 (defn score-board [board player intended-winner cached-scores]
@@ -87,9 +129,10 @@
         (potential-next-boards board player)]
     (cond
       looked-up-winner
-      looked-up-winner
+      [looked-up-winner {}]
       computed-winner
-      (score-and-cache-for-computed-winner board player computed-winner intended-winner)
+      (let [score (get-score-from-winner intended-winner computed-winner)]
+        [score (add-to-cache {} board player score)])
       (empty? achievable-boards)
       [0 (->
         {}
@@ -98,22 +141,8 @@
       :else
       (score-by-thinking-ahead player intended-winner achievable-boards cached-scores))))
 
-(defn score-move [board move player]
+(defn evaluate-move [board move player]
   (let [resulting-board (update-board board move player)]
     (score-board resulting-board (other-player  player) player {})))
 
-(deftype SmartAiPlayer [signature]
-  MoveSource
-  (next-move [this board]
-    (let [possible-moves (empty-squares board)
-          score-move-fn #(first (score-move board % signature))
-          optimal-move (apply
-                          max-key
-                          score-move-fn
-                          possible-moves)]
-      optimal-move)))
-
-
-(defn new-smart-ai-player [signature]
-  (SmartAiPlayer. signature))
 
