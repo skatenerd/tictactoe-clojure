@@ -20,25 +20,23 @@
 
 
 
-
+(def is-intended-winner)
 
 
 (defn compute-next-move-as-player [signature board]
-  (let [possible-moves (empty-squares board)
-        score-move-with-fixed-board #(score-move board % signature signature {})
-        optimal-move (apply
-                        max-key
-                        score-move-with-fixed-board
-                        possible-moves)]
-    optimal-move)
+  (binding [is-intended-winner #(= % signature)]
+    (let [possible-moves (empty-squares board)
+          score-move-with-fixed-board #(score-move board % signature {})
+          optimal-move (apply
+                          max-key
+                          score-move-with-fixed-board
+                          possible-moves)]
+      optimal-move)))
 
-  )
 
-
-(defn score-move [board move player intended-winner cache]
-  (let [[score cached-situations] (evaluate-move board move player cache intended-winner)]
-    score)
-  )
+(defn score-move [board move player cache]
+  (let [[score cached-situations] (evaluate-move board move player cache)]
+    score))
 
 (defn winning-next-moves [board signature]
   (let [next-moves (empty-squares board)]
@@ -47,9 +45,9 @@
 (defn winning-move [board signature]
   (first (winning-next-moves board signature)))
 
-(defn get-score-from-winner [intended-winner winner]
+(defn compute-final-score [winner]
   (if winner
-    (if (= intended-winner winner)
+    (if (is-intended-winner winner)
       1
       -1)
     nil))
@@ -58,36 +56,34 @@
   (if (contains? (set scores-of-future-boards) -1)
     -1
     (/ (count (filter #(= % 1) scores-of-future-boards))
-      (count scores-of-future-boards)))
-  )
+      (count scores-of-future-boards))))
 
-(defn minimize-score-as-human [player intended-winner board cached-scores]
+(defn minimize-score-as-human [player board cached-scores]
   (let
     [possible-moves (empty-squares board)
       scores-and-caches-of-future-boards
      (map
-       #(evaluate-move board % player cached-scores intended-winner)
+       #(evaluate-move board % player cached-scores)
        possible-moves)
      scores-of-future-boards (map first scores-and-caches-of-future-boards)
      caches-of-future-boards (map second scores-and-caches-of-future-boards)]
-    [(compute-score-as-human scores-of-future-boards) {}]
-    ))
+    [(compute-score-as-human scores-of-future-boards) {}]))
 
-(defn maximize-score-rationally [player intended-winner board cached-scores]
+(defn maximize-score-rationally [player board cached-scores]
   (let
     [possible-moves (empty-squares board)
       scores-and-caches-of-future-boards
      (map
-       #(evaluate-move board % player cached-scores intended-winner)
+       #(evaluate-move board % player cached-scores)
        possible-moves)
      scores-of-future-boards (map first scores-and-caches-of-future-boards)
      caches-of-future-boards (map second scores-and-caches-of-future-boards)]
     [(apply max scores-of-future-boards) {}]))
 
-(defn score-by-thinking-ahead [player intended-winner board cached-scores]
-  (if (= player intended-winner)
-    (maximize-score-rationally player intended-winner board cached-scores)
-    (minimize-score-as-human player intended-winner board cached-scores)))
+(defn score-by-thinking-ahead [player board cached-scores]
+  (if (is-intended-winner player)
+    (maximize-score-rationally player board cached-scores)
+    (minimize-score-as-human player board cached-scores)))
 
 ;(defn- evaluate-board-and-update-caches [player intended-winner {:keys [total-cache learned-situations scores]} board]
 ;  (let [[score new-situations-to-record] (evaluate-board board player total-cache)]
@@ -107,7 +103,7 @@
 ;    boards))
 
 
-(defn evaluate-board [board player intended-winner cached-scores]
+(defn evaluate-board [board player cached-scores]
   (let [looked-up-winner
         (cached-scores [board player])
         computed-winner
@@ -116,7 +112,7 @@
       looked-up-winner
       [looked-up-winner {}]
       computed-winner
-      (let [score (get-score-from-winner intended-winner computed-winner)]
+      (let [score (compute-final-score computed-winner)]
         [score (add-to-cache {} board player score)])
       (empty? (empty-squares board))
       [0 (->
@@ -124,13 +120,11 @@
         (add-to-cache board player 0)
         (add-to-cache board (other-player player) 0))]
       :else
-      (score-by-thinking-ahead player intended-winner board cached-scores))))
+      (score-by-thinking-ahead player board cached-scores))))
 
-(defn evaluate-move [board move player cache intended-winner]
+(defn evaluate-move [board move player cache]
   (let [resulting-board (update-board board move player)]
-    (evaluate-board resulting-board (other-player player) intended-winner cache)))
-
-
+    (evaluate-board resulting-board (other-player player) cache)))
 
 (defn other-player [player]
   (case
