@@ -1,6 +1,5 @@
 (ns tictactoe.game-state
   (:use tictactoe.board-utils))
-  ;(:use [tictactoe.board-utils [:only update-board]]))
 
 (defrecord GameState [board player])
 

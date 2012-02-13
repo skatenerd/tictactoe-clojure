@@ -164,7 +164,3 @@
   (it "adds to cache correctly"
     (let [game-state (new-game-state :foo :bar)]
     (should= {game-state 24} (add-to-cache {} game-state 24)))))
-
-;  (it "computes other player correctly"
-;    (should= :x (other-player :o))
-;    (should= :o (other-player :x))))
