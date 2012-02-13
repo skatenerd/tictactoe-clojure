@@ -31,4 +31,4 @@
         runner (new-game-runner player-1 player-2)]
     (run-game runner)))
 
-(-main)
+;(-main)

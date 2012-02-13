@@ -125,7 +125,7 @@
         (it "recognizes guaranteed-ties"
           (binding [is-intended-winner (fn [signature] (= signature :x))]
             (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {})]
-              (should= {(new-game-state @guaranteed-tie :o) 0} learned-info))))
+              (should (contains? learned-info (new-game-state @guaranteed-tie :o))))))
 
         (it "recognizes current ties"
           (binding [is-intended-winner (fn [signature] (= signature :x))]

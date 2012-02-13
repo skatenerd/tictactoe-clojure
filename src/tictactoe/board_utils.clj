@@ -77,7 +77,8 @@
         full (board-full? board)]
     (or winner full)))
 
-(defn print-row [row]
+(defn print-row [idx row]
+  (print (str idx))
   (doseq [square row]
     (print "|")
     (if square
@@ -86,8 +87,11 @@
   (println "|"))
 
 (defn print-board [board]
-  (doseq [row board]
-    (print-row row)))
+  (println "  0  1  2")
+  (loop [idx 0]
+    (print-row idx (nth board idx))
+    (if (< (inc idx) (count board))
+      (recur (inc idx)))))
 
 (defn farewell [board]
   (let [winner (game-winner board)]

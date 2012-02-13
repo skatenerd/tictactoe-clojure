@@ -4,7 +4,8 @@
                                       potential-next-boards
                                       game-winner
                                       game-winner-after-move
-                                      update-board]]
+                                      update-board
+                                      print-board]]
         [tictactoe.game-state]))
 
 (def is-intended-winner)
@@ -15,7 +16,10 @@
 (deftype SmartAiPlayer [signature]
   MoveSource
   (next-move [this board]
-    (compute-next-move (new-game-state board signature))))
+    (let [next-move (compute-next-move (new-game-state board signature))]
+      (println "Computer's move was:")
+      (prn next-move signature)
+      next-move)))
 
 (defn new-smart-ai-player [signature]
   (SmartAiPlayer. signature))
@@ -23,8 +27,9 @@
 
 (defn compute-next-move [game-state]
   (binding [is-intended-winner #(= % (:player game-state))]
-    (let [possible-moves (empty-squares (:board game-state))
-          score-move-with-fixed-board #(score-move game-state % {})
+    (let [[score cache] (evaluate-board game-state {})
+          possible-moves (empty-squares (:board game-state))
+          score-move-with-fixed-board #(score-move game-state % cache)
           optimal-move (apply
                           max-key
                           score-move-with-fixed-board
