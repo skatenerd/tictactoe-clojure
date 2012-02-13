@@ -27,12 +27,10 @@
   (binding [is-intended-winner #(= % (:player game-state))]
     (let [[score cache] (evaluate-board game-state {})
           possible-moves (empty-squares (:board game-state))
-          score-move-with-fixed-board #(score-move game-state % cache)
-          optimal-move (apply
-                          max-key
-                          score-move-with-fixed-board
-                          possible-moves)]
-      optimal-move)))
+          is-optimal-move #(=
+                             score
+                             (score-move game-state % cache))]
+      (first (filter is-optimal-move possible-moves)))))
 
 
 (defn score-move [game-state move cache]
