@@ -23,7 +23,6 @@
 (defn new-smart-ai-player [signature]
   (SmartAiPlayer. signature))
 
-
 (defn compute-next-move [game-state]
   (binding [is-intended-winner #(= % (:player game-state))]
     (let [[score cache] (evaluate-board game-state {})
@@ -57,13 +56,12 @@
     (/ (apply + scores-of-future-boards)
       (count scores-of-future-boards))))
 
-(defn score-move-and-cache-result [game-state [cache scores] move]
+(defn score-move-and-cache-result [[cache scores] move game-state]
   (let [[score updated-cache] (evaluate-move game-state move cache)]
     [updated-cache (conj scores score)]))
 
 (defn score-moves-and-cache-results [game-state current-cache moves]
-  (reduce #(score-move-and-cache-result game-state %1 %2) [current-cache []] moves))
-
+  (reduce #(score-move-and-cache-result %1 %2 game-state) [current-cache []] moves))
 
 (defn compute-score-from-achievable-scores [achievable-scores player]
   (if (is-intended-winner player)

@@ -2,7 +2,7 @@
   (:use [speclj.core]
         [tictactoe.smart-ai-player]
         [tictactoe.move-source]
-        [tictactoe.board-utils :only [empty-board]]
+        [tictactoe.board-utils :only [empty-board update-board]]
         [tictactoe.game-state]))
 
 (describe "scoring boards and generating moves: "
@@ -101,13 +101,6 @@
 
   (context "caching board scores"
     (context "private utilities"
-      (it "updates the total cache when it scores a move"
-;        (let [x-won-state (new-game-state @x-won-row :o)]
-;        (should=
-;          [{(new-game-state @x-won-row :o) 1} [1]]
-;          (score-and-cache-result [{} []] @x-can-win-row)
-      )
-
       (it "scores a series of moves and caches the results"
         (let [x-can-win-state (new-game-state @x-can-win-row :x)
               x-won-state (new-game-state @x-won-row :o)]
@@ -122,10 +115,17 @@
             (let [[score new-cached-situations] (evaluate-board (new-game-state @x-won-row :x) {})]
               (should= {(new-game-state @x-won-row :x) 1} new-cached-situations))))
 
-        (it "recognizes guaranteed-ties"
+        (it "recognizes guaranteed-ties and caches top-level result"
           (binding [is-intended-winner (fn [signature] (= signature :x))]
             (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {})]
-              (should (contains? learned-info (new-game-state @guaranteed-tie :o))))))
+              (should= 0 (learned-info (new-game-state @guaranteed-tie :o))))))
+
+      (it "recognizes guaranteed-ties and caches all explored results"
+        (binding [is-intended-winner (fn [signature] (= signature :x))]
+          (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {})
+                explored-board (update-board @guaranteed-tie [2 1] :o)
+                explored-state (new-game-state explored-board :x)]
+            (should= 0 (learned-info explored-state)))))
 
         (it "recognizes current ties"
           (binding [is-intended-winner (fn [signature] (= signature :x))]
