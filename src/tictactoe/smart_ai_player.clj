@@ -24,7 +24,6 @@
 (defn compute-next-move [game-state]
   (binding [is-intended-winner #(= % (:player game-state))]
     (let [possible-moves (empty-squares (:board game-state))
-          _ (prn possible-moves)
           score-move-with-fixed-board #(score-move game-state % {})
           optimal-move (apply
                           max-key
@@ -34,7 +33,6 @@
 
 
 (defn score-move [game-state move cache]
-  (prn move)
   (let [[score cached-situations] (evaluate-move game-state move cache)]
     score))
 
@@ -70,7 +68,7 @@
      (score-moves-and-cache-results game-state cached-scores possible-moves)
      score-of-current-state (compute-score-as-human scores-of-future-boards)]
 
-    [score-of-current-state (add-to-cache cached-scores game-state score-of-current-state)]))
+    [score-of-current-state (add-to-cache updated-cache game-state score-of-current-state)]))
 
 (defn maximize-score-rationally [game-state cached-scores]
   (let
@@ -80,7 +78,7 @@
      (score-moves-and-cache-results game-state cached-scores possible-moves)
      score-of-current-state (apply max scores-of-future-boards)]
 
-    [score-of-current-state (add-to-cache cached-scores game-state score-of-current-state)]))
+    [score-of-current-state (add-to-cache updated-cache game-state score-of-current-state)]))
 
 (defn score-by-thinking-ahead [game-state cached-scores]
   (if (is-intended-winner (:player game-state))
@@ -94,7 +92,7 @@
 
 (defn evaluate-board [game-state cached-scores]
   (let [looked-up-winner
-        (cached-scores [game-state])
+        (cached-scores game-state)
         computed-winner
         (game-winner (:board game-state))]
     (cond
