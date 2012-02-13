@@ -91,13 +91,31 @@
                                         @guaranteed-tie
                                         :o)
                                       {})))))
-        ;(should= -1 (first (evaluate-board @x-can-win-row :x :o {})))
+        (it "recognizes when game is over"
+          (binding [is-intended-winner (fn [signature] (= signature :o))]
+            (should= -1 (first (evaluate-board (new-game-state @x-can-win-row :x) {})))))
         ;(should= -1 (first (evaluate-board @x-can-win-col :x :o {})))
         ;(should= -1 (first (evaluate-board @x-won-row :x :o {})))
 
         ))
 
   (context "caching board scores"
+    (context "private utilities"
+      (it "updates the total cache when it scores a move"
+;        (let [x-won-state (new-game-state @x-won-row :o)]
+;        (should=
+;          [{(new-game-state @x-won-row :o) 1} [1]]
+;          (score-and-cache-result [{} []] @x-can-win-row)
+      )
+
+      (it "scores a series of moves and caches the results"
+        (let [x-can-win-state (new-game-state @x-can-win-row :x)
+              x-won-state (new-game-state @x-won-row :o)]
+          (binding [is-intended-winner (fn [player] (= player :x))]
+            (should=
+              [{x-won-state 1} [1]]
+              (score-moves-and-cache-results x-can-win-state {} [[0 2]]))))))
+
     (context "from perspective of player x"
         (it "caches a win when it encounters one"
           (binding [is-intended-winner (fn [signature] (= signature :x))]
@@ -130,34 +148,6 @@
           (let [game-state (new-game-state @x-can-win-smart :x)]
           (should= 1 (first (evaluate-move game-state [1 1] {})))
           (should= -1 (first (evaluate-move game-state [0 2] {}))))))))
-
-;  (context "scoring a collection of moves"
-;    (it "evaluates scores on an empty collection of boards"
-;      (let [mock-cache {:a :b}]
-;        (should=
-;          {:total-cache mock-cache
-;           :learned-situations {}
-;           :scores []}
-;          (evaluate-and-cache-boards [] mock-cache :x))))
-;    (it "evaluates score of one board"
-;      (let [mock-cache {:a :b}
-;            learned-situation {[@current-tie :x] 0}
-;            updated-cache (conj mock-cache learned-situation)]
-;            (should=
-;              {:total-cache updated-cache
-;               :learned-situations learned-situation
-;               :scores [0]}
-;              (evaluate-and-cache-boards [@current-tie] mock-cache :x))))
-;    (it "evaluates score of multiple boards"
-;      (let [mock-cache {:a :b}
-;            learned-situations {[@current-tie :x] 0
-;                                [@x-won-row :x] 1}
-;            updated-cache (merge mock-cache learned-situations)]
-;            (should=
-;              {:total-cache updated-cache
-;               :learned-situations learned-situations
-;               :scores [0 1]}
-;              (evaluate-and-cache-boards [@current-tie @x-won-row] mock-cache :x)))))
   )
 
 (describe "utilities"

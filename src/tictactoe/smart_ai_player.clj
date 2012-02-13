@@ -53,27 +53,32 @@
     (/ (count (filter #(= % 1) scores-of-future-boards))
       (count scores-of-future-boards))))
 
+(defn score-move-and-cache-result [game-state [cache scores] move]
+  (let [[score updated-cache] (evaluate-move game-state move cache)]
+    [updated-cache (conj scores score)]))
+
+(defn score-moves-and-cache-results [game-state current-cache moves]
+  (reduce #(score-move-and-cache-result game-state %1 %2) [current-cache []] moves))
+
 (defn minimize-score-as-human [game-state cached-scores]
   (let
-    [possible-moves (empty-squares (:board game-state))
-      scores-and-caches-of-future-boards
-     (map
-       #(evaluate-move game-state % cached-scores)
-       possible-moves)
-     scores-of-future-boards (map first scores-and-caches-of-future-boards)
-     caches-of-future-boards (map second scores-and-caches-of-future-boards)]
-    [(compute-score-as-human scores-of-future-boards) {}]))
+    [possible-moves
+     (empty-squares (:board game-state))
+     [updated-cache scores-of-future-boards]
+     (score-moves-and-cache-results game-state cached-scores possible-moves)
+     score-of-current-state (compute-score-as-human scores-of-future-boards)]
+
+    [score-of-current-state (add-to-cache cached-scores game-state score-of-current-state)]))
 
 (defn maximize-score-rationally [game-state cached-scores]
   (let
-    [possible-moves (empty-squares (:board game-state))
-      scores-and-caches-of-future-boards
-     (map
-       #(evaluate-move game-state % cached-scores)
-       possible-moves)
-     scores-of-future-boards (map first scores-and-caches-of-future-boards)
-     caches-of-future-boards (map second scores-and-caches-of-future-boards)]
-    [(apply max scores-of-future-boards) {}]))
+    [possible-moves
+     (empty-squares (:board game-state))
+     [updated-cache scores-of-future-boards]
+     (score-moves-and-cache-results game-state cached-scores possible-moves)
+     score-of-current-state (apply max scores-of-future-boards)]
+
+    [score-of-current-state (add-to-cache cached-scores game-state score-of-current-state)]))
 
 (defn score-by-thinking-ahead [game-state cached-scores]
   (if (is-intended-winner (:player game-state))
@@ -98,8 +103,8 @@
 ;    boards))
 
 
-(defn cache-tie [game-state]
-  (-> {}
+(defn cache-tie [cache game-state]
+  (-> cache
     (add-to-cache game-state 0)
     (add-to-cache (swap-player game-state) 0)))
 
@@ -113,9 +118,9 @@
       [looked-up-winner {}]
       computed-winner
       (let [score (compute-final-score computed-winner)]
-        [score (add-to-cache {} game-state score)])
+        [score (add-to-cache cached-scores game-state score)])
       (empty? (empty-squares (:board game-state)))
-      [0 (cache-tie game-state)]
+      [0 (cache-tie cached-scores game-state)]
       :else
       (score-by-thinking-ahead game-state cached-scores))))
 
