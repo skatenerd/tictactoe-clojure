@@ -21,7 +21,7 @@
 
 (defn prompt-next-move-with-warning [board signature]
   (println "The previous move was invalid")
-  (prompt-next-move board alias))
+  (prompt-next-move board signature))
 
 (deftype HumanPlayer [signature]
   MoveSource

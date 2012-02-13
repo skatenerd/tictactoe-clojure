@@ -9,21 +9,22 @@
 
 (def is-intended-winner)
 
-(declare evaluate-board score-move compute-next-move-as-player evaluate-move add-to-cache)
+(declare evaluate-board score-move compute-next-move evaluate-move add-to-cache)
 
 
 (deftype SmartAiPlayer [signature]
   MoveSource
   (next-move [this board]
-    (compute-next-move-as-player (new-game-state board signature))))
+    (compute-next-move (new-game-state board signature))))
 
 (defn new-smart-ai-player [signature]
   (SmartAiPlayer. signature))
 
 
-(defn compute-next-move-as-player [game-state]
+(defn compute-next-move [game-state]
   (binding [is-intended-winner #(= % (:player game-state))]
     (let [possible-moves (empty-squares (:board game-state))
+          _ (prn possible-moves)
           score-move-with-fixed-board #(score-move game-state % {})
           optimal-move (apply
                           max-key
@@ -33,6 +34,7 @@
 
 
 (defn score-move [game-state move cache]
+  (prn move)
   (let [[score cached-situations] (evaluate-move game-state move cache)]
     score))
 
@@ -85,24 +87,6 @@
     (maximize-score-rationally game-state cached-scores)
     (minimize-score-as-human game-state cached-scores)))
 
-;(defn- evaluate-board-and-update-caches [player intended-winner {:keys [total-cache learned-situations scores]} board]
-;  (let [[score new-situations-to-record] (evaluate-board board player total-cache)]
-;    {:total-cache (conj total-cache new-situations-to-record)
-;     :learned-situations new-situations-to-record
-;     :scores (conj scores score)}))
-;
-;(defn- score-board-and-update-caches-as-player [player intended-winner]
-;  (partial score-board-and-update-caches player intended-winner))
-;
-;(defn evaluate-and-cache-boards [boards cache current-player intended-winner]
-;  (reduce
-;    (score-board-and-update-caches-as-player (other-player current-player) intended-winner)
-;    {:total-cache mock-cache
-;     :learned-situations {}
-;     :scores []}
-;    boards))
-
-
 (defn cache-tie [cache game-state]
   (-> cache
     (add-to-cache game-state 0)
@@ -115,7 +99,7 @@
         (game-winner (:board game-state))]
     (cond
       looked-up-winner
-      [looked-up-winner {}]
+      [looked-up-winner cached-scores]
       computed-winner
       (let [score (compute-final-score computed-winner)]
         [score (add-to-cache cached-scores game-state score)])
