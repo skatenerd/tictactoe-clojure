@@ -9,7 +9,7 @@
 
 (def is-intended-winner)
 
-(declare evaluate-board score-move compute-next-move-as-player evaluate-move other-player add-to-cache)
+(declare evaluate-board score-move compute-next-move-as-player evaluate-move add-to-cache)
 
 
 (deftype SmartAiPlayer [signature]
@@ -97,6 +97,12 @@
 ;     :scores []}
 ;    boards))
 
+
+(defn cache-tie [game-state]
+  (-> {}
+    (add-to-cache game-state 0)
+    (add-to-cache (swap-player game-state) 0)))
+
 (defn evaluate-board [game-state cached-scores]
   (let [looked-up-winner
         (cached-scores [game-state])
@@ -109,26 +115,12 @@
       (let [score (compute-final-score computed-winner)]
         [score (add-to-cache {} game-state score)])
       (empty? (empty-squares (:board game-state)))
-      [0 (->
-        {}
-        (add-to-cache game-state 0)
-        (add-to-cache (new-game-state (:board game-state) (other-player (:player game-state))) 0))]
+      [0 (cache-tie game-state)]
       :else
       (score-by-thinking-ahead game-state cached-scores))))
 
 (defn evaluate-move [game-state move cache]
-  (let [resulting-board (update-board (:board game-state) move (:player game-state))
-        other-player (other-player (:player game-state))
-        resulting-game-state (new-game-state resulting-board other-player)]
-    (evaluate-board resulting-game-state cache)))
-
-(defn other-player [player]
-  (case
-    player
-    :x
-    :o
-    :o
-    :x))
+    (evaluate-board (apply-move game-state move) cache))
 
 (defn add-to-cache [cache game-state score]
   (conj cache {game-state score}))
