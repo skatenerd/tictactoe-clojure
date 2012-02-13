@@ -12,7 +12,6 @@
 
 (declare evaluate-board score-move compute-next-move evaluate-move add-to-cache)
 
-
 (deftype SmartAiPlayer [signature]
   MoveSource
   (next-move [this board]
@@ -55,7 +54,7 @@
 (defn compute-score-as-human [scores-of-future-boards]
   (if (contains? (set scores-of-future-boards) -1)
     -1
-    (/ (count (filter #(= % 1) scores-of-future-boards))
+    (/ (apply + scores-of-future-boards)
       (count scores-of-future-boards))))
 
 (defn score-move-and-cache-result [game-state [cache scores] move]
@@ -65,30 +64,21 @@
 (defn score-moves-and-cache-results [game-state current-cache moves]
   (reduce #(score-move-and-cache-result game-state %1 %2) [current-cache []] moves))
 
-(defn minimize-score-as-human [game-state cached-scores]
-  (let
-    [possible-moves
-     (empty-squares (:board game-state))
-     [updated-cache scores-of-future-boards]
-     (score-moves-and-cache-results game-state cached-scores possible-moves)
-     score-of-current-state (compute-score-as-human scores-of-future-boards)]
 
-    [score-of-current-state (add-to-cache updated-cache game-state score-of-current-state)]))
-
-(defn maximize-score-rationally [game-state cached-scores]
-  (let
-    [possible-moves
-     (empty-squares (:board game-state))
-     [updated-cache scores-of-future-boards]
-     (score-moves-and-cache-results game-state cached-scores possible-moves)
-     score-of-current-state (apply max scores-of-future-boards)]
-
-    [score-of-current-state (add-to-cache updated-cache game-state score-of-current-state)]))
+(defn compute-score-from-achievable-scores [achievable-scores player]
+  (if (is-intended-winner player)
+    (apply max achievable-scores)
+    (compute-score-as-human achievable-scores)))
 
 (defn score-by-thinking-ahead [game-state cached-scores]
-  (if (is-intended-winner (:player game-state))
-    (maximize-score-rationally game-state cached-scores)
-    (minimize-score-as-human game-state cached-scores)))
+  (let
+    [possible-moves
+     (empty-squares (:board game-state))
+     [updated-cache scores-of-future-boards]
+     (score-moves-and-cache-results game-state cached-scores possible-moves)
+     score-of-current-state (compute-score-from-achievable-scores scores-of-future-boards (:player game-state))]
+
+    [score-of-current-state (add-to-cache updated-cache game-state score-of-current-state)]))
 
 (defn cache-tie [cache game-state]
   (-> cache
