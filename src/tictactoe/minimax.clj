@@ -3,8 +3,7 @@
                                       potential-next-boards
                                       game-winner
                                       game-winner-after-move
-                                      update-board
-                                      print-board]]
+                                      update-board]]
         [tictactoe.game-state]))
 
 (def is-intended-winner)
@@ -18,7 +17,7 @@
       -1)
     nil))
 
-(defn compute-score-as-human [scores-of-future-boards]
+(defn compute-score-as-opponent [scores-of-future-boards]
   (if (contains? (set scores-of-future-boards) -1)
     -1
     (/ (apply + scores-of-future-boards)
@@ -34,7 +33,7 @@
 (defn compute-score-from-achievable-scores [achievable-scores player]
   (if (is-intended-winner player)
     (apply max achievable-scores)
-    (compute-score-as-human achievable-scores)))
+    (compute-score-as-opponent achievable-scores)))
 
 (defn score-by-thinking-ahead [game-state cached-scores]
   (let
@@ -42,7 +41,9 @@
      (empty-squares (:board game-state))
      [updated-cache scores-of-future-boards]
      (score-moves-and-cache-results game-state cached-scores possible-moves)
-     score-of-current-state (compute-score-from-achievable-scores scores-of-future-boards (:player game-state))]
+     score-of-current-state (compute-score-from-achievable-scores
+                              scores-of-future-boards
+                              (:player game-state))]
 
     [score-of-current-state (add-to-cache updated-cache game-state score-of-current-state)]))
 

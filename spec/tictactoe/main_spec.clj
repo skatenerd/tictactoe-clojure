@@ -1,8 +1,6 @@
 (ns tictactoe.main-spec
   (:use [speclj.core]
-        [tictactoe.main]
-        [tictactoe.dumb-ai-player :only [new-dumb-ai-player]]
-        [tictactoe.human-player :only [new-human-player]]))
+        [tictactoe.main]))
 
 (describe "menu functionality"
   (it "builds players out of strings"

@@ -1,12 +1,15 @@
 (ns tictactoe.dumb-ai-player
   (:use [tictactoe.move-source]
-        [tictactoe.board-utils :only [move-legal]]))
+        [tictactoe.board-utils :only [move-legal]]
+        [tictactoe.ui-handler]))
 
 (defrecord DumbAiPlayer [calls moves signature]
   MoveSource
-  (next-move [this board]
-    (reset! calls (conj @calls ["next-move" board]))
-    (moves board)))
+  (next-move [this board ui-handler]
+    (swap! calls conj ["next-move" board])
+    (let [move (moves board)]
+      (report-move ui-handler board move signature)
+      (moves board))))
 
 (defn random-move []
   [(rand-int 3) (rand-int 3)])
