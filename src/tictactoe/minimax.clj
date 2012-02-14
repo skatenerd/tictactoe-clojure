@@ -100,7 +100,7 @@
           is-optimal-move #(=
                              score
                              (cache (apply-move game-state %)))]
-      (first (filter is-optimal-move possible-moves)))))
+      (rand-nth (filter is-optimal-move possible-moves)))))
   ([board player]
     (compute-next-move board player nil)))
 

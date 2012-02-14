@@ -35,8 +35,10 @@
         (with-in-str "7\n5\n1"
           (should= :unbeatable-ai (get-player :x)))
         (with-in-str "34\n87\n2"
-          (should= :dumb-ai (get-player :x)))
+          (should= :medium-ai (get-player :x)))
         (with-in-str "34\n87\n3"
+          (should= :dumb-ai (get-player :x)))
+        (with-in-str "34\n87\n4"
           (should= :human (get-player :x)))))))
 
 

@@ -28,8 +28,9 @@
 
 (def input-to-player-type
   {"1" :unbeatable-ai
-   "2" :dumb-ai
-   "3" :human})
+   "2" :medium-ai
+   "3" :dumb-ai
+   "4" :human})
 
 
 (def player-type-choices-strings
