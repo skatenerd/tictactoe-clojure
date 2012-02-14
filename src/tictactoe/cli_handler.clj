@@ -26,24 +26,27 @@
 
   )
 
-(defn input-to-player-type [input]
-  (case input
-    "1"
-    :ai
-    "2"
-    :human
-    nil))
+(def input-to-player-type
+  {"1" :unbeatable-ai
+   "2" :dumb-ai
+   "3" :human})
+
+
+(def player-type-choices-strings
+  (for [[key val] input-to-player-type]
+    (str key " for " (name val))))
 
 
 (defn get-player [signature]
-  (println (str "Should Player " signature " be computer or human? 1 for mensch-machine 2 for human"))
+  (println (str "Select player type for player " (name signature)))
+  (doseq [option player-type-choices-strings] (println option))
   (loop [user-input (read-line)]
     (let [player-type (input-to-player-type  user-input)]
       (println "")
       (if player-type
         player-type
         (do
-          (println "Please enter 1 or 2")
+          (println "Please enter a valid option")
           (recur (read-line)))))))
 
 

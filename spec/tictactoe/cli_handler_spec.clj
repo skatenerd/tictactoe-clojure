@@ -31,8 +31,13 @@
 
   (context "parsing game setup"
     (it "parses player selection correctly"
-      (with-in-str "7\n5\n1"
-        (should= :ai (get-player :x))))))
+      (with-out-str
+        (with-in-str "7\n5\n1"
+          (should= :unbeatable-ai (get-player :x)))
+        (with-in-str "34\n87\n2"
+          (should= :dumb-ai (get-player :x)))
+        (with-in-str "34\n87\n3"
+          (should= :human (get-player :x)))))))
 
 
 (describe "human player moving with illegal moves"
