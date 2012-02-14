@@ -3,7 +3,7 @@
         [tictactoe.board-utils])
   (:require [clojure.string :as string]))
 
-(declare prompt-next-move prompt-next-move-with-warning print-board get-player)
+(declare prompt-next-move prompt-next-move-with-warning print-board get-player get-board-size)
 
 (deftype ConsoleUIHandler []
   UIHandler
@@ -20,17 +20,18 @@
     (print-board board))
   (get-game-parameters [this]
     {:x (get-player :x)
-     :o (get-player :o)})
-
-
-
-  )
+     :o (get-player :o)
+     :board-size (get-board-size)}))
 
 (def input-to-player-type
   {"1" :unbeatable-ai
    "2" :medium-ai
    "3" :dumb-ai
    "4" :human})
+
+(def input-to-board-size
+  {"3" 3
+   "4" 4})
 
 
 (def player-type-choices-strings
@@ -50,6 +51,15 @@
           (println "Please enter a valid option")
           (recur (read-line)))))))
 
+(defn get-board-size []
+  (println "Please enter board size: 3 or 4?")
+  (loop [user-input (read-line)]
+    (let [board-size (input-to-board-size user-input)]
+      (if board-size
+        board-size
+        (do
+          (println "Please enter 3 or 4")
+          (recur (read-line)))))))
 
 (defn- print-row [idx row]
   (print (str idx))

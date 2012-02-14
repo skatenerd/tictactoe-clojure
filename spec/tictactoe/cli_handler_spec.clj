@@ -39,7 +39,16 @@
         (with-in-str "34\n87\n3"
           (should= :dumb-ai (get-player :x)))
         (with-in-str "34\n87\n4"
-          (should= :human (get-player :x)))))))
+          (should= :human (get-player :x)))))
+
+    (it "builds the game parameters correctly"
+      (with-out-str
+        (with-in-str "1\n554\n2\n4"
+          (should=
+            {:x :unbeatable-ai
+             :o :medium-ai
+             :board-size 4}
+            (get-game-parameters @cli-handler)))))))
 
 
 (describe "human player moving with illegal moves"
