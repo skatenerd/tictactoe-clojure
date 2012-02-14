@@ -3,7 +3,7 @@
         [tictactoe.board-utils])
   (:require [clojure.string :as string]))
 
-(declare prompt-next-move prompt-next-move-with-warning print-board)
+(declare prompt-next-move prompt-next-move-with-warning print-board get-player)
 
 (deftype ConsoleUIHandler []
   UIHandler
@@ -17,8 +17,35 @@
       (println (str "Game over, winner was " winner))
       (println "There was no winner"))
     (println "final board was ")
-    (print-board board)
-  ))
+    (print-board board))
+  (get-game-parameters [this]
+    {:x (get-player :x)
+     :o (get-player :o)})
+
+
+
+  )
+
+(defn input-to-player-type [input]
+  (case input
+    "1"
+    :ai
+    "2"
+    :human
+    nil))
+
+
+(defn get-player [signature]
+  (println (str "Should Player " signature " be computer or human? 1 for mensch-machine 2 for human"))
+  (loop [user-input (read-line)]
+    (let [player-type (input-to-player-type  user-input)]
+      (println "")
+      (if player-type
+        player-type
+        (do
+          (println "Please enter 1 or 2")
+          (recur (read-line)))))))
+
 
 (defn- print-row [idx row]
   (print (str idx))

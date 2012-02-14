@@ -4,6 +4,7 @@
   (get-user-move-input [this board player])
   (report-move [this board move player])
   (farewell [this board winner])
+  (get-game-parameters [this])
   (print-text [this text])
   (print-text-ln [this text])
   )

@@ -11,7 +11,7 @@
 
   (with cli-handler (new-cli-handler))
 
-  (context "parsing"
+  (context "parsing moves"
     (it "reads simple user input"
       (with-out-str
         (with-in-str "0 0"
@@ -27,7 +27,13 @@
     (it "reads convoluted user input"
       (with-out-str
         (with-in-str "row 2 and column 1"
-          (should= [2 1] (get-user-move-input @cli-handler @board :x)))))))
+          (should= [2 1] (get-user-move-input @cli-handler @board :x))))))
+
+  (context "parsing game setup"
+    (it "parses player selection correctly"
+      (with-in-str "7\n5\n1"
+        (should= :ai (get-player :x))))))
+
 
 (describe "human player moving with illegal moves"
   (with center-occupied-board (update-board empty-board [1 1] :x))
