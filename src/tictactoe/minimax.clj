@@ -92,14 +92,17 @@
 (defn add-to-cache [cache game-state score]
   (conj cache {game-state score}))
 
-(defn compute-next-move [board player]
+(defn compute-next-move
+  ([board player max-recursion-depth]
   (let [game-state (new-game-state board player)]
-    (let [[score cache] (evaluate-board game-state {} player nil)
+    (let [[score cache] (evaluate-board game-state {} player max-recursion-depth)
           possible-moves (empty-squares board)
           is-optimal-move #(=
                              score
                              (cache (apply-move game-state %)))]
       (first (filter is-optimal-move possible-moves)))))
+  ([board player]
+    (compute-next-move board player nil)))
 
 (defn score-move [game-state move cache intended-winner remaining-moves-ahead]
   (let [[score cached-situations] (evaluate-move game-state move cache intended-winner remaining-moves-ahead)]
