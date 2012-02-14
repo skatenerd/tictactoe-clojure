@@ -3,7 +3,7 @@
         [tictactoe.dumb-ai-player]
         [tictactoe.game-runner]
         [tictactoe.move-source]
-        [tictactoe.ui-handler]
+        [tictactoe.ui-silencer]
         [tictactoe.board-utils :only [empty-board update-board]]))
 
 (describe "simple game loop"
@@ -27,7 +27,11 @@
   (it "prompts the first user for a move, and prompts the second user for a move with updated board"
     (main-loop @player-1 @player-2 empty-board (new-ui-silencer))
     (should= ["next-move" empty-board] (last @(.calls @player-1)))
-    (should= ["next-move" @board-after-first-turn] (last @(.calls @player-2)))))
+    (should= ["next-move" @board-after-first-turn] (last @(.calls @player-2))))
+  (it "says farewell"
+    (let [ui-handler (new-ui-silencer)]
+      (main-loop @player-1 @player-2 empty-board ui-handler)
+      (should= "farewell" (first @(.calls ui-handler))))))
 
 
 

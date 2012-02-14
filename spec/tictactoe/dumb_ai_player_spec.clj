@@ -3,7 +3,7 @@
         [tictactoe.dumb-ai-player]
         [tictactoe.move-source]
         [tictactoe.board-utils]
-        [tictactoe.ui-handler]))
+        [tictactoe.ui-silencer]))
 
 (describe "mock player"
   (with legal-moves (set (for [row (range 3)

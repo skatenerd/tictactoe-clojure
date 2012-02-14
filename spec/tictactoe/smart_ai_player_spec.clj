@@ -2,7 +2,7 @@
   (:use [speclj.core]
         [tictactoe.smart-ai-player]
         [tictactoe.move-source]
-        [tictactoe.ui-handler]))
+        [tictactoe.ui-silencer]))
 
 
 (describe "scoring boards and generating moves: "
