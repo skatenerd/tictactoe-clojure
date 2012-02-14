@@ -52,39 +52,33 @@
 (context "scoring the board"
   (context "from perspective of player x"
     (it "scores based on current victor"
-      (binding [is-intended-winner (fn [signature] (= signature :x))]
-        (should= 1 (first (evaluate-board (new-game-state @x-won-col :x) {})))))
+      (should= 1 (first (evaluate-board (new-game-state @x-won-col :x) {} :x))))
 
     (it "scores based on immediate victor"
-      (binding [is-intended-winner (fn [signature] (= signature :x))]
-        (should= 1 (first (evaluate-board (new-game-state @x-can-win-row :x) {})))
-        (should= 1 (first (evaluate-board (new-game-state @x-can-win-col :x) {})))))
+      (should= 1 (first (evaluate-board (new-game-state @x-can-win-row :x) {} :x)))
+      (should= 1 (first (evaluate-board (new-game-state @x-can-win-col :x) {} :x))))
 
 
     (it "recognizes guaranteed-ties"
-      (binding [is-intended-winner (fn [signature] (= signature :x))]
-        (should= 0 (first (evaluate-board (new-game-state @guaranteed-tie :o) {})))))
+      (should= 0 (first (evaluate-board (new-game-state @guaranteed-tie :o) {} :x))))
 
     (it "recognizes current ties"
-      (binding [is-intended-winner (fn [signature] (= signature :x))]
-        (should= 0 (first (evaluate-board (new-game-state @current-tie :x) {})))))
+      (should= 0 (first (evaluate-board (new-game-state @current-tie :x) {} :x))))
 
     (it "scores based on distant victor"
-      (binding [is-intended-winner (fn [signature] (= signature :x))]
-        (should= 1 (first (evaluate-board (new-game-state @x-can-win-smart :x) {}))))))
+      (should= 1 (first (evaluate-board (new-game-state @x-can-win-smart :x) {} :x)))))
 
 
   (context "from the perspective of player o"
     (it "recognizes potential for opponent to throw game"
-      (binding [is-intended-winner (fn [signature] (= signature :o))]
-        (should= (/ 1 2) (first (evaluate-board
-                                  (new-game-state
-                                    @guaranteed-tie
-                                    :o)
-                                  {})))))
+      (should= (/ 1 2) (first (evaluate-board
+                                (new-game-state
+                                  @guaranteed-tie
+                                  :o)
+                                {}
+                                :o))))
     (it "recognizes when game is over"
-      (binding [is-intended-winner (fn [signature] (= signature :o))]
-        (should= -1 (first (evaluate-board (new-game-state @x-can-win-row :x) {})))))
+      (should= -1 (first (evaluate-board (new-game-state @x-can-win-row :x) {} :o))))
     ;(should= -1 (first (evaluate-board @x-can-win-col :x :o {})))
     ;(should= -1 (first (evaluate-board @x-won-row :x :o {})))
 
@@ -95,50 +89,43 @@
       (it "scores a series of moves and caches the results"
         (let [x-can-win-state (new-game-state @x-can-win-row :x)
               x-won-state (new-game-state @x-won-row :o)]
-          (binding [is-intended-winner (fn [player] (= player :x))]
-            (should=
-              [{x-won-state 1} [1]]
-              (score-moves-and-cache-results x-can-win-state {} [[0 2]]))))))
+          (should=
+            [{x-won-state 1} [1]]
+            (score-moves-and-cache-results x-can-win-state {} [[0 2]] :x)))))
 
     (context "from perspective of player x"
       (it "caches a win when it encounters one"
-        (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (let [[score new-cached-situations] (evaluate-board (new-game-state @x-won-row :x) {})]
-            (should= {(new-game-state @x-won-row :x) 1} new-cached-situations))))
+        (let [[score new-cached-situations] (evaluate-board (new-game-state @x-won-row :x) {} :x)]
+          (should= {(new-game-state @x-won-row :x) 1} new-cached-situations)))
 
       (it "recognizes guaranteed-ties and caches top-level result"
-        (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {})]
-            (should= 0 (learned-info (new-game-state @guaranteed-tie :o))))))
+        (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {} :x)]
+          (should= 0 (learned-info (new-game-state @guaranteed-tie :o)))))
 
       (it "recognizes guaranteed-ties and caches all explored results"
-        (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {})
-                explored-board (update-board @guaranteed-tie [2 1] :o)
-                explored-state (new-game-state explored-board :x)]
-            (should= 0 (learned-info explored-state)))))
+        (let [[score learned-info] (evaluate-board (new-game-state @guaranteed-tie :o) {} :x)
+              explored-board (update-board @guaranteed-tie [2 1] :o)
+              explored-state (new-game-state explored-board :x)]
+          (should= 0 (learned-info explored-state))))
 
       (it "recognizes current ties"
-        (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (let [[score learned-info] (evaluate-board (new-game-state @current-tie :x) {})]
-            (should=
-              {(new-game-state @current-tie :x) 0
-               (new-game-state @current-tie :o) 0}
-              learned-info))))))
+        (let [[score learned-info] (evaluate-board (new-game-state @current-tie :x) {} :x)]
+          (should=
+            {(new-game-state @current-tie :x) 0
+             (new-game-state @current-tie :o) 0}
+            learned-info)))))
 
 
   (context "evaluating a move"
     (context "from perspective of player x"
 
       (it "scores a winning move"
-        (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (should= 1 (first (evaluate-move (new-game-state @x-can-win-row :x) [0 2] {})))))
+        (should= 1 (first (evaluate-move (new-game-state @x-can-win-row :x) [0 2] {} :x))))
 
       (it "scores a distantly winning move"
-        (binding [is-intended-winner (fn [signature] (= signature :x))]
-          (let [game-state (new-game-state @x-can-win-smart :x)]
-            (should= 1 (first (evaluate-move game-state [1 1] {})))
-            (should= -1 (first (evaluate-move game-state [0 2] {}))))))))
+        (let [game-state (new-game-state @x-can-win-smart :x)]
+          (should= 1 (first (evaluate-move game-state [1 1] {} :x)))
+          (should= -1 (first (evaluate-move game-state [0 2] {} :x)))))))
 )
 
 (describe "utilities"
