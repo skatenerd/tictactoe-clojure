@@ -43,7 +43,7 @@
 
     (it "builds the game parameters correctly"
       (with-out-str
-        (with-in-str "1\n554\n2\n4"
+        (with-in-str "1\n554\n2\n88\n4"
           (should=
             {:x :unbeatable-ai
              :o :medium-ai
@@ -52,7 +52,7 @@
 
 
 (describe "human player moving with illegal moves"
-  (with center-occupied-board (update-board empty-board [1 1] :x))
+  (with center-occupied-board (update-board (empty-board 3) [1 1] :x))
   (with cli-handler (new-cli-handler))
   (it "detects collisions"
     (with-out-str

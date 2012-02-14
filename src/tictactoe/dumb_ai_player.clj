@@ -11,14 +11,14 @@
       (report-move ui-handler board move signature)
       (moves board))))
 
-(defn random-move []
-  [(rand-int 3) (rand-int 3)])
+(defn random-move [board]
+  [(rand-int (count board)) (rand-int (count board))])
 
 (defn random-legal-move [board]
-  (loop [current-move (random-move)]
+  (loop [current-move (random-move board)]
     (if (move-legal board current-move)
       current-move
-      (recur (random-move)))))
+      (recur (random-move board)))))
 
 (defn new-dumb-ai-player
   ([moves signature]

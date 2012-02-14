@@ -6,9 +6,10 @@
         [tictactoe.ui-silencer]))
 
 (describe "mock player"
-  (with legal-moves (set (for [row (range 3)
-                          col (range 3)]
-                      [row col])))
+  (with board-size (first legal-board-sizes))
+  (with legal-moves (set (for [row (range @board-size)
+                               col (range @board-size)]
+                           [row col])))
   (with first-board [[:x nil :x]
                      [:o :o nil]
                      [:x :o nil]])
@@ -25,7 +26,7 @@
 
   (it "moves randomly and legally, if we tell it to"
     (let [made-moves (set (for [_ (range 60)]
-                            (next-move @random-behaving-player empty-board @ui-handler)))]
+                            (next-move @random-behaving-player (empty-board @board-size) @ui-handler)))]
       (should= @legal-moves made-moves))
 
     (let [made-moves (set (for [_ (range 60)]

@@ -15,10 +15,10 @@
     (should= (new-game-state :foo :o) (swap-player game-state))))
 
 (it "applies a move correctly"
-  (let [game-state (new-game-state empty-board :x)
-        x-in-corner [[:x nil nil]
+  (let [x-in-corner [[:x nil nil]
                      [nil nil nil]
-                     [nil nil nil]]]
+                     [nil nil nil]]
+        game-state (new-game-state (empty-board (count x-in-corner)) :x)]
     (should= (new-game-state x-in-corner :o) (apply-move game-state [0 0]))))
 
 )

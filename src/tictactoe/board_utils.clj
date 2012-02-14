@@ -1,6 +1,9 @@
 (ns tictactoe.board-utils)
 
-(def empty-board (vec (repeat 3 (vec (repeat 3 nil)))))
+(def legal-board-sizes [3 4])
+
+(defn empty-board [size]
+  (vec (repeat size (vec (repeat size nil)))))
 
 (defn move-within-bounds [board move]
   (every?
@@ -43,11 +46,12 @@
   (let [board-residents (map #(get-in board %) path)]
     (reduce #(if (= %1 %2) %1) board-residents)))
 
-(defn win-paths []
-  (concat (row-wins 3) (col-wins 3) (diag-wins 3)))
+(defn win-paths [board]
+  (let [board-size (count board)]
+    (concat (row-wins board-size) (col-wins board-size) (diag-wins board-size))))
 
 (defn game-winner [board]
-  (some #(path-winner % board) (win-paths)))
+  (some #(path-winner % board) (win-paths board)))
 
 (defn game-winner-after-move [board move signature]
   (game-winner (update-board board move signature)))

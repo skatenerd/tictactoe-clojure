@@ -3,6 +3,7 @@
         [tictactoe.board-utils]))
 
 (describe "board utilities"
+  (with board-size (first legal-board-sizes))
   (with x-in-corner [[:x nil nil]
                      [nil nil nil]
                      [nil nil nil]])
@@ -29,11 +30,11 @@
   (context "updating board"
 
   (it "updates a blank board"
-      (should= @x-in-corner (update-board empty-board [0 0] :x)))
+      (should= @x-in-corner (update-board (empty-board 3) [0 0] :x)))
 
   (it "tells you when a move is illegal"
       (should= @x-in-corner (update-board @x-in-corner [0 0] :x))
-      (should= empty-board (update-board empty-board [74 11] :o)))
+      (should= (empty-board @board-size) (update-board (empty-board @board-size) [74 11] :o)))
     )
 
   (context "check for game over"

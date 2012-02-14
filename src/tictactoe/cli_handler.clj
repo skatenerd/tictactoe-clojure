@@ -52,13 +52,13 @@
           (recur (read-line)))))))
 
 (defn get-board-size []
-  (println "Please enter board size: 3 or 4?")
+  (println (str "Please enter board size: " legal-board-sizes))
   (loop [user-input (read-line)]
     (let [board-size (input-to-board-size user-input)]
       (if board-size
         board-size
         (do
-          (println "Please enter 3 or 4")
+          (println (str "Please enter " legal-board-sizes))
           (recur (read-line)))))))
 
 (defn- print-row [idx row]
