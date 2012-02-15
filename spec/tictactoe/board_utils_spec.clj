@@ -77,8 +77,6 @@
       (should= :x (game-winner @col-win))
       (should= :x (game-winner @row-win))
       (should= :x (game-winner @diag-win))
-      (should= :x (game-winner-after-move @x-can-win-diag [2 2] :x))
-      (should= :x (game-winner-after-move @x-can-win-col [2 0] :x))
       (should-not (game-winner @x-in-corner))
       (should-not (game-winner @x-and-o-on-board)))
 

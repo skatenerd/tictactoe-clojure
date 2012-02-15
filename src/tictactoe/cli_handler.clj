@@ -1,6 +1,6 @@
 (ns tictactoe.cli-handler
   (:use [tictactoe.ui-handler]
-        [tictactoe.board-utils])
+        [tictactoe.board-utils :only [legal-board-sizes move-legal]])
   (:require [clojure.string :as string]))
 
 (declare prompt-next-move prompt-next-move-with-warning print-board get-player get-board-size)

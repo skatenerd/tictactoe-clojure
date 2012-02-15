@@ -2,7 +2,6 @@
   (:use [tictactoe.board-utils :only [empty-squares
                                       potential-next-boards
                                       game-winner
-                                      game-winner-after-move
                                       update-board]]
         [tictactoe.game-state]))
 

@@ -1,5 +1,5 @@
 (ns tictactoe.game-runner
-  (:use [tictactoe.board-utils :only [empty-board update-board game-over? game-winner]]
+  (:use [tictactoe.board-utils :only [update-board game-over? game-winner]]
         [tictactoe.move-source]
         [tictactoe.ui-handler]))
 
@@ -11,6 +11,4 @@
     (if continue-game?
       (recur inactive-player active-player new-board ui-handler)
       (farewell ui-handler new-board (game-winner new-board)))))
-;  ([active-player inactive-player board-size ui-handler]
-;    (main-loop active-player inactive-player empty-board ui-handler))
 
