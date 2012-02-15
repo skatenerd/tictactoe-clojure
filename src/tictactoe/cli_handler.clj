@@ -10,7 +10,7 @@
   (get-user-move-input [this board player]
     (prompt-next-move board player))
   (report-move [this board move player]
-    (println "Compute's move was")
+    (println (str player "'s move was"))
     (prn move player))
   (farewell [this board winner]
     (if winner
