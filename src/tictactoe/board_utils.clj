@@ -17,6 +17,7 @@
 
 (defn move-legal [board move]
   (and
+    move
     (move-within-bounds board move)
     (not (move-taken board move))))
 

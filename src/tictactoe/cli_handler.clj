@@ -78,6 +78,15 @@
     (if (< (inc idx) (count board))
       (recur (inc idx)))))
 
+(defn parse-numbers [numbers board-size]
+  (case
+    (count numbers)
+    2
+    numbers
+    1
+    [(quot (first numbers) board-size) (mod (first numbers) board-size)]
+    nil))
+
 (defn prompt-next-move [board signature]
   (println "Please enter a move.")
   (println (str "Your alias is " (str signature)))
@@ -87,9 +96,10 @@
   (let [input (read-line)
         splitted (string/split input #"[,\s]+")
         numbers (filter #(not (nil? (re-find #"[0-9]" %))) splitted)
-        numbers (map read-string numbers)]
-    (if (move-legal board numbers)
-      numbers
+        numbers (map read-string numbers)
+        parsed-to-row-col-format (parse-numbers numbers (count board))]
+    (if (move-legal board parsed-to-row-col-format)
+      parsed-to-row-col-format
       (prompt-next-move-with-warning board signature))))
 
 

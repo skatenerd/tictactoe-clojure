@@ -33,6 +33,8 @@
       (should= @x-in-corner (update-board (empty-board 3) [0 0] :x)))
 
   (it "tells you when a move is illegal"
+      (should (move-legal @x-in-corner [2 2]))
+      (should-not (move-legal @x-in-corner nil))
       (should= @x-in-corner (update-board @x-in-corner [0 0] :x))
       (should= (empty-board @board-size) (update-board (empty-board @board-size) [74 11] :o)))
     )
