@@ -5,9 +5,9 @@
         [tictactoe.board-utils]))
 
 (describe "Get and parse CLI input"
-  (with board [[nil :x  nil]
-               [nil :o  nil]
-               [:x  nil :o]])
+  (with board [[nil :x nil]
+               [nil :o nil]
+               [:x nil :o ]])
 
   (with cli-handler (new-cli-handler))
 
@@ -32,7 +32,7 @@
     (it "reads single-integer user input"
       (with-out-str
         (with-in-str "2\n"
-        (should= [0 2] (get-user-move-input @cli-handler @board :x)))))
+          (should= [0 2] (get-user-move-input @cli-handler @board :x)))))
 
     (it "parses input to row-col format"
       (should= [1 0] (parse-numbers '(3) 3))
@@ -40,7 +40,7 @@
       (should= [2 2] (parse-numbers '(2 2) 3))
       (should-not (parse-numbers '(1 1 1 1 1 1) 3)))
 
-  )
+    )
 
   (context "parsing game setup"
     (it "parses player selection correctly"

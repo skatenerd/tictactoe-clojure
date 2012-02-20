@@ -72,7 +72,9 @@
 
 
 (defn- print-board [board]
-  (println "  0  1  2")
+  (doseq [i (range (count board))]
+    (print (str "  " i)))
+  (println "")
   (loop [idx 0]
     (print-row idx (nth board idx))
     (if (< (inc idx) (count board))
