@@ -8,7 +8,7 @@
     3
     nil
     4
-    4))
+    5))
 
 (deftype SmartAiPlayer [signature]
   MoveSource

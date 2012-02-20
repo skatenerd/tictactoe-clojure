@@ -37,20 +37,30 @@
     (/ (apply + scores-of-future-boards)
       (count scores-of-future-boards))))
 
-(defn prune [score-set player intended-winner]
+(defn prune [min-score max-score player intended-winner]
   (if (is-intended-winner player intended-winner)
-    (contains? score-set 1)
-    (contains? score-set -1)))
+    (= max-score 1)
+    (= min-score -1)))
 
-(defn score-move-and-cache-result [[cache scores score-set] move game-state intended-winner remaining-moves-ahead]
+(defn score-move-and-cache-result [[cache scores min-score max-score] move game-state intended-winner remaining-moves-ahead]
   (if
-    (prune score-set (:player game-state) intended-winner)
-    [cache scores]
+    (prune min-score max-score (:player game-state) intended-winner)
+    [cache scores min-score max-score]
     (let [[score updated-cache] (evaluate-move game-state move cache intended-winner remaining-moves-ahead)]
-      [updated-cache (conj scores score) (conj score-set score)])))
+      [updated-cache
+       (conj scores score)
+       (min min-score score)
+       (max max-score score)])))
 
 (defn score-moves-and-cache-results [game-state current-cache moves intended-winner remaining-moves-ahead]
-  (take 2 (reduce #(score-move-and-cache-result %1 %2 game-state intended-winner remaining-moves-ahead) [current-cache [] #{}] moves)))
+  (take 2
+    (reduce #(score-move-and-cache-result
+               %1
+               %2
+               game-state
+               intended-winner
+               remaining-moves-ahead)
+      [current-cache [] 0 0] moves)))
 
 (defn compute-score-from-achievable-scores [achievable-scores player intended-winner]
   (if (is-intended-winner player intended-winner)
