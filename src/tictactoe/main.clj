@@ -13,4 +13,4 @@
         player-2 (build-player (:o game-parameters) :o)
         board-size (:board-size game-parameters)]
     (main-loop player-1 player-2 (empty-board board-size) ui-handler)))
-(main)
+;(main)

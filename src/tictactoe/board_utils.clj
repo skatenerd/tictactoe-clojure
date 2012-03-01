@@ -23,7 +23,10 @@
 
 (defn update-board [board posn new-value]
   (if (move-legal board posn)
-    (assoc-in board posn new-value)
+    (assoc-in
+      board
+      posn
+      new-value)
     board))
 
 (defn row-wins [board-size]

@@ -127,7 +127,34 @@
         (let [game-state (new-game-state @x-can-win-smart :x)]
           (should= 1 (first (evaluate-move game-state [1 1] {} :x nil)))
           (should= -1 (first (evaluate-move game-state [0 2] {} :x nil)))))))
-)
+
+
+  (context "prescribing move"
+    (it "prescribes obvious win"
+      (should=
+        [0 2]
+        (compute-next-move @x-can-win-row :x)))
+    (it "realizes when the game is over"
+      (should-not (compute-next-move @x-won-row :x))
+      (should-not (compute-next-move @x-won-row :o))
+      (should-not (compute-next-move @current-tie :o)))
+    )
+  )
+
+(describe "interop"
+  (it "calculates next move from string"
+    (let [x-can-win-row-string "xx oo xo "
+          player-x-string "x"]
+      (should=
+        [0 2]
+        (computeNextMoveFromString x-can-win-row-string player-x-string))))
+  (it "prescribes nothing when there is nothing to do"
+    (let [tie-string "xoxooxxxo"
+          x-won-string "xoooxooox"
+          player-x-string "x"]
+      (should-not (computeNextMoveFromString tie-string player-x-string))
+      (should-not (computeNextMoveFromString x-won-string player-x-string))))
+  )
 
 (describe "utilities"
   (it "adds to cache correctly"
