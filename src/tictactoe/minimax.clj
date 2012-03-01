@@ -4,10 +4,7 @@
                                       game-winner
                                       update-board]]
         [tictactoe.string-parsing]
-        [tictactoe.game-state])
-  (:gen-class
-    :name minimax
-    :methods [#^{:static true} [computeNextMoveFromString [String String] Object]]))
+        [tictactoe.game-state]))
 
 
 ;(deftype minimax-config [intended-winner max-recursion-depth])
@@ -128,19 +125,6 @@
         (rand-nth optimal-moves)))))
   ([board player]
     (compute-next-move board player nil)))
-
-(defn computeNextMoveFromString
-  [board-string player-string]
-  (compute-next-move
-    (string-to-board board-string)
-    (string-to-player player-string)))
-
-(defn -computeNextMoveFromString
-  [board-string player-string]
-  (let [computed-move (computeNextMoveFromString board-string player-string)]
-    (if computed-move
-      (java.util.ArrayList. computed-move)
-      computed-move)))
 
 (defn score-move [game-state move cache intended-winner remaining-moves-ahead]
   (let [[score cached-situations] (evaluate-move game-state move cache intended-winner remaining-moves-ahead)]

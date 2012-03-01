@@ -141,21 +141,6 @@
     )
   )
 
-(describe "interop"
-  (it "calculates next move from string"
-    (let [x-can-win-row-string "xx oo xo "
-          player-x-string "x"]
-      (should=
-        [0 2]
-        (computeNextMoveFromString x-can-win-row-string player-x-string))))
-  (it "prescribes nothing when there is nothing to do"
-    (let [tie-string "xoxooxxxo"
-          x-won-string "xoooxooox"
-          player-x-string "x"]
-      (should-not (computeNextMoveFromString tie-string player-x-string))
-      (should-not (computeNextMoveFromString x-won-string player-x-string))))
-  )
-
 (describe "utilities"
   (it "adds to cache correctly"
     (let [game-state (new-game-state :foo :bar)]
