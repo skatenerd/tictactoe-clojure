@@ -137,7 +137,10 @@
 
 (defn -computeNextMoveFromString
   [board-string player-string]
-  (java.util.ArrayList. (computeNextMoveFromString board-string player-string)))
+  (let [computed-move (computeNextMoveFromString board-string player-string)]
+    (if computed-move
+      (java.util.ArrayList. computed-move)
+      computed-move)))
 
 (defn score-move [game-state move cache intended-winner remaining-moves-ahead]
   (let [[score cached-situations] (evaluate-move game-state move cache intended-winner remaining-moves-ahead)]
