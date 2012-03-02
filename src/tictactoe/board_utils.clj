@@ -5,12 +5,17 @@
 (defn empty-board [size]
   (vec (repeat size (vec (repeat size nil)))))
 
+(defn subset? [sub super]
+  (every? #(contains? super %) sub))
+
 (defn board-legal [board]
   (and
     (not (empty? board))
     (apply = (map count board))
     (contains? (set legal-board-sizes) (count (first board)))
-    (clojure.set/subset? (set (flatten board)) #{:x :o nil})))
+    (contains? (set legal-board-sizes) (count board))
+    (subset? (set (flatten board)) #{:x :o nil})))
+
 
 (defn move-within-bounds [board move]
   (every?

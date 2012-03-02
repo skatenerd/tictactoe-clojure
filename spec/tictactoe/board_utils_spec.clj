@@ -90,8 +90,9 @@
       (should (board-legal @full-board))
       (let
         [illegal-character (assoc-in @full-board [0 0] :z)
-         irregular-lengths [[:x][:o :o nil][:x :o :x]]]
-
+         irregular-lengths [[:x][:o :o nil][:x :o :x]]
+         legal [[:o :o :o] [:x nil :o] [:o nil :x]]]
+        (should (board-legal legal))
         (should-not (board-legal illegal-character))
         (should-not (board-legal irregular-lengths))))
     )

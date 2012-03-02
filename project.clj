@@ -4,5 +4,5 @@
   :dev-dependencies [[speclj "2.1.1"]]
   :test-path "spec/"
   :main tictactoe.main
-  :aot [tictactoe.java-interop tictactoe.board-utils]
+  :aot [tictactoe.board-utils tictactoe.minimax]
 )
