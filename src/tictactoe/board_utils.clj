@@ -14,6 +14,7 @@
     (apply = (map count board))
     (contains? (set legal-board-sizes) (count (first board)))
     (contains? (set legal-board-sizes) (count board))
+    (= (count board) (count (first board)))
     (subset? (set (flatten board)) #{:x :o nil})))
 
 

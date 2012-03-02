@@ -91,9 +91,11 @@
       (let
         [illegal-character (assoc-in @full-board [0 0] :z)
          irregular-lengths [[:x][:o :o nil][:x :o :x]]
+         too-long [[:o :o :o] [:o :o :o] [:o :o :o] [:o:o:o]]
          legal [[:o :o :o] [:x nil :o] [:o nil :x]]]
         (should (board-legal legal))
         (should-not (board-legal illegal-character))
+        (should-not (board-legal too-long))
         (should-not (board-legal irregular-lengths))))
     )
 
