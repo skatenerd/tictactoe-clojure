@@ -85,7 +85,17 @@
     (it "recognizes a full board"
       (should (board-full? @full-board))
       (should-not (board-full? @col-win)))
+
+    (it "recognizes legal and illegal boards"
+      (should (board-legal @full-board))
+      (let
+        [illegal-character (assoc-in @full-board [0 0] :z)
+         irregular-lengths [[:x][:o :o nil][:x :o :x]]]
+
+        (should-not (board-legal illegal-character))
+        (should-not (board-legal irregular-lengths))))
     )
+
 
 
 
